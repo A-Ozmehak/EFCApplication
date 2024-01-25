@@ -1,25 +1,26 @@
 ﻿using Infrastructure.Contexts;
 using Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories;
 
-public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where TEntity : class where TContext : class
+public abstract class Repository<TEntity, TContext> : IRepository<TEntity> where TEntity : class where TContext : DbContext
 {
-    private readonly ContactContext _contactContext;
+   private readonly TContext _context;
 
-    protected Repository(ContactContext contactContext)
+    protected Repository(TContext context)
     {
-        _contactContext = contactContext;
+        _context = context;
     }
 
     public virtual TEntity Create(TEntity entity)
     {
         try
         {
-            _contactContext.Set<TEntity>().Add(entity);
-            _contactContext.SaveChanges();
+            _context.Set<TEntity>().Add(entity);
+            _context.SaveChanges();
             return entity;
         }
         catch(Exception ex) { Debug.WriteLine(ex.Message); }
@@ -30,7 +31,7 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
     {
         try
         {
-            var result = _contactContext.Set<TEntity>().ToList();
+            var result = _context.Set<TEntity>().ToList();
             if (result != null)
                 return result;
         }
@@ -42,7 +43,7 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
     {
         try
         {
-            var result = _contactContext.Set<TEntity>().FirstOrDefault(predicate);
+            var result = _context.Set<TEntity>().FirstOrDefault(predicate);
 
             if (result != null)
                 return result;
@@ -57,8 +58,8 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
         {
             if (entity != null)
             {
-                _contactContext.Set<TEntity>().Update(entity);
-                _contactContext.SaveChanges();
+                _context.Set<TEntity>().Update(entity);
+                _context.SaveChanges();
 
                 return entity;
             }
@@ -71,11 +72,11 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
     {
         try
         {
-            var entity = _contactContext.Set<TEntity>().FirstOrDefault(predicate);
+            var entity = _context.Set<TEntity>().FirstOrDefault(predicate);
             if (entity != null)
             {
-                _contactContext.Set<TEntity>().Remove(entity);
-                _contactContext.SaveChanges();
+                _context.Set<TEntity>().Remove(entity);
+                _context.SaveChanges();
 
                 return true;
             }
@@ -88,7 +89,7 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
     {
         try
         {
-            var result = _contactContext.Set<TEntity>().Any(predicate);
+            var result = _context.Set<TEntity>().Any(predicate);
             return result;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
