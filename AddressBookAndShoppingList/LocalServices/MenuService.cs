@@ -20,8 +20,9 @@ internal class MenuService(IContactService contactService)
             Console.WriteLine("2.Add a product to the shopping list");
             Console.WriteLine("3.Get all contacts");
             Console.WriteLine("4.Get one contact");
-            Console.WriteLine("5.Delete a contact");
-            Console.WriteLine("6.Close the application");
+            Console.WriteLine("5.Update a contact");
+            Console.WriteLine("6.Delete a contact");
+            Console.WriteLine("7.Close the application");
             Console.WriteLine();
             Console.WriteLine("Choose an option");
 
@@ -42,9 +43,12 @@ internal class MenuService(IContactService contactService)
                     GetOneContactOption();
                     break;
                 case "5":
-                    DeleteContactOption();
+                    UpdateContactOption();
                     break;
                 case "6":
+                    DeleteContactOption();
+                    break;
+                case "7":
                     CloseApplicationOption();
                     break;
             }
@@ -151,46 +155,42 @@ internal class MenuService(IContactService contactService)
         Console.WriteLine("Update contact");
         Console.WriteLine("---------------");
 
-        Console.WriteLine("Enter the email of the contact you want to update: ");
+        Console.Write("Enter the Email of the contact to update: ");
+        string existingEmail = Console.ReadLine()!;
+
+        Console.Write("Enter a new first name: ");
+        string firstName = Console.ReadLine()!;
+
+        Console.Write("Enter a new last name: ");
+        string lastName = Console.ReadLine()!;
+
+        Console.Write("Enter a new email: ");
         string email = Console.ReadLine()!;
 
-        if (email == null)
+        Console.Write("Enter a new phone number: ");
+        string phoneNumber = Console.ReadLine()!;
+
+        Console.Write("Enter a new address: ");
+        string address = Console.ReadLine()!;
+
+        Console.Write("Enter a new postal code: ");
+        string postalCode = Console.ReadLine()!;
+
+        Console.Write("Enter a new city: ");
+        string city = Console.ReadLine()!;
+
+        var updatedContactDto = new ContactDto
         {
-            Console.WriteLine("Can't find a contact with that email");
-        }
-        else
-        {
-            var contact = new ContactDto();
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            PhoneNumber = phoneNumber,
+            Address = address,
+            PostalCode = postalCode,
+            City = city
+        };
 
-            Console.WriteLine("Add Contact");
-            Console.WriteLine("-------------");
-
-            Console.Write("FirstName: ");
-            contact.FirstName = Console.ReadLine()!;
-
-            Console.Write("LastName: ");
-            contact.LastName = Console.ReadLine()!;
-
-            Console.Write("Email: ");
-            contact.Email = Console.ReadLine()!;
-
-            Console.Write("PhoneNumber: ");
-            contact.PhoneNumber = Console.ReadLine()!;
-
-            Console.Write("Address: ");
-            contact.Address = Console.ReadLine()!;
-
-            Console.Write("PostalCode: ");
-            contact.PostalCode = Console.ReadLine()!;
-
-            Console.Write("City: ");
-            contact.City = Console.ReadLine()!;
-
-            _contactService.Update(email);
-            Console.WriteLine("The contact is now updated");
-
-         
-        }
+        _contactService.Update(updatedContactDto);
     }
 
     public void DeleteContactOption()

@@ -43,6 +43,7 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
         try
         {
             var result = _contactContext.Set<TEntity>().FirstOrDefault(predicate);
+
             if (result != null)
                 return result;
         }
@@ -54,13 +55,12 @@ public abstract class Repository<TEntity, TContext> :IRepository<TEntity> where 
     {
         try
         {
-            var updatedEntity = _contactContext.Set<TEntity>().Find(entity);
-            if (updatedEntity != null)
+            if (entity != null)
             {
-                _contactContext.Set<TEntity>().Update(updatedEntity);
+                _contactContext.Set<TEntity>().Update(entity);
                 _contactContext.SaveChanges();
 
-                return updatedEntity;
+                return entity;
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }

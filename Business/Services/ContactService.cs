@@ -2,6 +2,7 @@
 using Business.Interfaces;
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
+using Infrastructure.Repositories;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Net;
@@ -90,24 +91,23 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
         return null!;
     }
 
-    public void Update(ContactDto contact)
+    public void Update(ContactDto updatedContactDto)
     {
         try
         {
-            var existingContact = _contactRepository.GetOne(x => x.Email == contact.Email);
+            var existingContact = _contactRepository.GetOne(contact => contact.Email == updatedContactDto.Email);
             if (existingContact != null)
             {
-                existingContact.FirstName = contact.FirstName;
-                existingContact.LastName = contact.LastName;
-                existingContact.Email = contact.Email;
-                existingContact.Address = contact.Address;
-                existingContact.PostalCode = contact.PostalCode;
-                existingContact.City = contact.City;
-                existingContact.PhoneNumber = contact.PhoneNumber;
+                existingContact.FirstName = updatedContactDto.FirstName;
+                existingContact.LastName = updatedContactDto.LastName;
+                existingContact.Email = updatedContactDto.Email;
+                existingContact.Address = updatedContactDto.Address;
+                existingContact.PostalCode = updatedContactDto.PostalCode;
+                existingContact.City = updatedContactDto.City;
+                existingContact.PhoneNumber = updatedContactDto.PhoneNumber;
 
                 _contactRepository.Update(existingContact);
             }
-
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
     }
