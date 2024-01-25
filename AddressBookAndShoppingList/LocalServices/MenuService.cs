@@ -126,29 +126,91 @@ internal class MenuService(IContactService contactService)
 
     public void GetOneContactOption()
     {
-        //Console.WriteLine("Show Contact");
-        //Console.WriteLine("---------------");
+        Console.WriteLine("Show Contact");
+        Console.WriteLine("---------------");
 
-        //Console.WriteLine("Enter the name of the contact you want to see: ");
-        //string firstName = Console.ReadLine()!;
-        //ContactDto contact = _contactService.GetOne(firstName);
+        Console.WriteLine("Enter the email of the contact you want to see: ");
+        string email = Console.ReadLine()!;
+        ContactDto contact = _contactService.GetOne(email);
 
-        //if (contact == null)
-        //{
-        //    Console.WriteLine("Can't find a contact with that name");
-        //}
-        //else
-        //{
-        //    Console.WriteLine($"{contact.FirstName} {contact.LastName}");
-        //    Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
-        //    Console.WriteLine($"{contact.Address} {contact.PostalCode} {contact.City}");
-        //    Console.WriteLine("\n\n");
-        //}
+        if (contact == null)
+        {
+            Console.WriteLine("Can't find a contact with that email");
+        }
+        else
+        {
+            Console.WriteLine($"{contact.FirstName} {contact.LastName}");
+            Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
+            Console.WriteLine($"{contact.Address} {contact.PostalCode} {contact.City}");
+            Console.WriteLine("\n\n");
+        }
+    }
+
+    public void UpdateContactOption()
+    {
+        Console.WriteLine("Update contact");
+        Console.WriteLine("---------------");
+
+        Console.WriteLine("Enter the email of the contact you want to update: ");
+        string email = Console.ReadLine()!;
+
+        if (email == null)
+        {
+            Console.WriteLine("Can't find a contact with that email");
+        }
+        else
+        {
+            var contact = new ContactDto();
+
+            Console.WriteLine("Add Contact");
+            Console.WriteLine("-------------");
+
+            Console.Write("FirstName: ");
+            contact.FirstName = Console.ReadLine()!;
+
+            Console.Write("LastName: ");
+            contact.LastName = Console.ReadLine()!;
+
+            Console.Write("Email: ");
+            contact.Email = Console.ReadLine()!;
+
+            Console.Write("PhoneNumber: ");
+            contact.PhoneNumber = Console.ReadLine()!;
+
+            Console.Write("Address: ");
+            contact.Address = Console.ReadLine()!;
+
+            Console.Write("PostalCode: ");
+            contact.PostalCode = Console.ReadLine()!;
+
+            Console.Write("City: ");
+            contact.City = Console.ReadLine()!;
+
+            _contactService.Update(email);
+            Console.WriteLine("The contact is now updated");
+
+         
+        }
     }
 
     public void DeleteContactOption()
     {
-        
+        Console.WriteLine("Remove Contact");
+        Console.WriteLine("---------------");
+
+        Console.WriteLine("Enter the email of the contact you want to remove: ");
+        string email = Console.ReadLine()!;
+
+        if (email == null)
+        {
+            Console.WriteLine("Can't find a contact with that email");
+        }
+        else
+        {
+            Console.WriteLine("The contact is now removed");
+            _contactService.Remove(email);
+
+        }
     }
 
     public void CloseApplicationOption()
