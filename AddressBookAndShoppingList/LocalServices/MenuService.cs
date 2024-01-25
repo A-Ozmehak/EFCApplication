@@ -106,7 +106,7 @@ internal class MenuService(IContactService contactService)
         Console.WriteLine("All contacts");
         Console.WriteLine("--------------");
 
-        if (contacts.Any())
+        if (contacts == null)
         { 
             Console.WriteLine("No contacts found");
             Console.WriteLine("\n");
