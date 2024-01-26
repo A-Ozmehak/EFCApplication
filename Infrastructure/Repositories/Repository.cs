@@ -52,6 +52,19 @@ public abstract class Repository<TEntity, TContext> : IRepository<TEntity> where
         return null!;
     }
 
+    public virtual TEntity GetOne(TEntity entity)
+    {
+        try
+        {
+            var result = _context.Set<TEntity>().FirstOrDefault(entity);
+
+            if (result != null)
+                return result;
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return null!;
+    }
+
     public virtual TEntity Update(TEntity entity)
     {
         try
