@@ -74,8 +74,11 @@ internal class MenuService(IContactService contactService)
         Console.Write("PhoneNumber: ");
         contact.PhoneNumber = Console.ReadLine()!;
 
-        Console.Write("Address: ");
-        contact.Address = Console.ReadLine()!;
+        Console.Write("StreetName: ");
+        contact.StreetName = Console.ReadLine()!;
+
+        Console.Write("StreetNumber: ");
+        contact.StreetNumber = Console.ReadLine()!;
 
         Console.Write("PostalCode: ");
         contact.PostalCode = Console.ReadLine()!;
@@ -122,7 +125,7 @@ internal class MenuService(IContactService contactService)
                 Console.WriteLine($"Name: {contact.FirstName} {contact.LastName}");
                 Console.WriteLine($"Email: {contact.Email}");
                 Console.WriteLine($"Phone number: {contact.PhoneNumber}");
-                Console.WriteLine($"Address: {contact.Address} {contact.PostalCode} {contact.City}");
+                Console.WriteLine($"Address: {contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
                 Console.WriteLine("\n");
             }
         }
@@ -145,7 +148,7 @@ internal class MenuService(IContactService contactService)
         {
             Console.WriteLine($"{contact.FirstName} {contact.LastName}");
             Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
-            Console.WriteLine($"{contact.Address} {contact.PostalCode} {contact.City}");
+            Console.WriteLine($"{contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
             Console.WriteLine("\n\n");
         }
     }
@@ -170,8 +173,11 @@ internal class MenuService(IContactService contactService)
         Console.Write("Enter a new phone number: ");
         string phoneNumber = Console.ReadLine()!;
 
-        Console.Write("Enter a new address: ");
-        string address = Console.ReadLine()!;
+        Console.Write("Enter a new street name: ");
+        string streetName = Console.ReadLine()!;
+
+        Console.Write("Enter a new street number: ");
+        string streetNumber = Console.ReadLine()!;
 
         Console.Write("Enter a new postal code: ");
         string postalCode = Console.ReadLine()!;
@@ -185,7 +191,8 @@ internal class MenuService(IContactService contactService)
             LastName = lastName,
             Email = email,
             PhoneNumber = phoneNumber,
-            Address = address,
+            StreetName = streetName,
+            StreetNumber = streetNumber,
             PostalCode = postalCode,
             City = city
         };
