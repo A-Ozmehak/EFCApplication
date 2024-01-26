@@ -9,9 +9,11 @@ using System.Net;
 
 namespace Business.Services;
 
-public class ContactService(IContactRepository contactRepository) : IContactService
+public class ContactService(IContactRepository contactRepository, IAddressRepository addressRepository, IPhoneNumberRepository phoneNumberRepository) : IContactService
 {
     private readonly IContactRepository _contactRepository = contactRepository;
+    private readonly IAddressRepository _addressRepository = addressRepository;
+    private readonly IPhoneNumberRepository _phoneNumberRepository = phoneNumberRepository;
 
     public bool CreateContact(ContactDto contact)
     {
@@ -19,15 +21,19 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
         {
             if (!_contactRepository.Exists(x => x.Email == contact.Email))
             {
+                var addressEntity = _addressRepository.GetOne(x => x.StreetName == contact.StreetName);
+                addressEntity ??= _addressRepository.Create(new AddressEntity { StreetName = contact.StreetName, StreetNumber = contact.StreetNumber, PostalCode = contact.PostalCode, City = contact.City });
+
+                var phoneNumberEntity = _phoneNumberRepository.GetOne(x => x.PhoneNumber == contact.PhoneNumber);
+                phoneNumberEntity ??= _phoneNumberRepository.Create(new PhoneNumberEntity { PhoneNumber = contact.PhoneNumber });
+
                 var contactEntity = new ContactEntity
                 {
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
                     Email = contact.Email,
-                    Address = contact.Address,
-                    PostalCode = contact.PostalCode,
-                    City = contact.City,
-                    PhoneNumber = contact.PhoneNumber
+                    AddressId = addressEntity.Id,
+                    PhoneNumberId = phoneNumberEntity.Id                
                 };
 
                 var result = _contactRepository.Create(contactEntity);
@@ -37,7 +43,7 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
                 }
             }
         }
-        catch(Exception ex) { Debug.WriteLine(ex.Message); }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return false;
     }
 
@@ -56,10 +62,11 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
                     Email = contact.Email,
-                    Address = contact.Address,
-                    PostalCode = contact.PostalCode,
-                    City = contact.City,
-                    PhoneNumber = contact.PhoneNumber
+                    StreetName = contact.Address?.StreetName,
+                    StreetNumber = contact.Address?.StreetNumber,
+                    PostalCode = contact.Address?.PostalCode,
+                    City = contact.Address?.City,
+                    PhoneNumber = contact.PhoneNumber?.PhoneNumber
                 });
             }
         }
@@ -71,7 +78,7 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
     {
         try
         {
-           var contact = _contactRepository.GetOne(x => x.Email == email);
+            var contact = _contactRepository.GetOneByEmail(email);
             if (contact != null)
             {
                 return new ContactDto
@@ -79,13 +86,14 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
                     Email = contact.Email,
-                    Address = contact.Address,
-                    PostalCode = contact.PostalCode,
-                    City = contact.City,
-                    PhoneNumber = contact.PhoneNumber
+                    StreetName = contact.Address?.StreetName,
+                    StreetNumber = contact.Address?.StreetNumber,
+                    PostalCode = contact.Address?.PostalCode,
+                    City = contact.Address?.City,
+                    PhoneNumber = contact.PhoneNumber?.PhoneNumber
                 };
             }
-            
+
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return null!;
@@ -101,10 +109,10 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
                 existingContact.FirstName = updatedContactDto.FirstName;
                 existingContact.LastName = updatedContactDto.LastName;
                 existingContact.Email = updatedContactDto.Email;
-                existingContact.Address = updatedContactDto.Address;
-                existingContact.PostalCode = updatedContactDto.PostalCode;
-                existingContact.City = updatedContactDto.City;
-                existingContact.PhoneNumber = updatedContactDto.PhoneNumber;
+                existingContact.Address!.StreetName = updatedContactDto.StreetName;
+                existingContact.Address.PostalCode = updatedContactDto.PostalCode;
+                existingContact.Address.City = updatedContactDto.City;
+                existingContact.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
 
                 _contactRepository.Update(existingContact);
             }
@@ -124,6 +132,6 @@ public class ContactService(IContactRepository contactRepository) : IContactServ
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-      
+
     }
 }
