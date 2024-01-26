@@ -16,10 +16,8 @@ var builder = Host.CreateDefaultBuilder().ConfigureServices(services =>
     services.AddSingleton<IContactService, ContactService>();
 
     services.AddSingleton<IAddressRepository, AddressRepository>();
-    services.AddSingleton<IAddressService, AddressService>();
 
     services.AddSingleton<IPhoneNumberRepository, PhoneNumberRepository>();
-    services.AddSingleton<IPhoneNumberService, PhoneNumberService>();
 
     services.AddSingleton<IProductRepository, ProductRepository>();
     services.AddSingleton<IStoreRepository, StoreRepository>();

@@ -110,6 +110,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                 existingContact.LastName = updatedContactDto.LastName;
                 existingContact.Email = updatedContactDto.Email;
                 existingContact.Address!.StreetName = updatedContactDto.StreetName;
+                existingContact.Address!.StreetNumber = updatedContactDto.StreetNumber;
                 existingContact.Address.PostalCode = updatedContactDto.PostalCode;
                 existingContact.Address.City = updatedContactDto.City;
                 existingContact.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
