@@ -21,16 +21,13 @@ public class ContactEntity
     [Column(TypeName = "varchar(100)")]
     public string Email { get; set; } = null!;
 
-    [Column(TypeName = "nvarchar(50)")]
-    public string? Address { get; set; }
+    public int AddressId { get; set; }
 
-    [Column(TypeName = "varchar(6)")]
-    public string? PostalCode { get; set; }
-
-    [Column(TypeName = "nvarchar(50)")]
-    public string? City { get; set; }
+    public AddressEntity? Address { get; set; }
 
     [Required]
-    [Column(TypeName = "varchar(11)")]
-    public string PhoneNumber { get; set; } = null!;
+    public int PhoneNumberId { get; set; }
+    public PhoneNumberEntity PhoneNumber { get; set; } = null!;
+
+
 }

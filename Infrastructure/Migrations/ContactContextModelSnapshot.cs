@@ -21,6 +21,31 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Infrastructure.Entities.AddressEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("varchar(6)");
+
+                    b.Property<string>("StreetName")
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("StreetNumber")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("Infrastructure.Entities.ContactEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -29,11 +54,8 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -47,19 +69,55 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("varchar(11)");
-
-                    b.Property<string>("PostalCode")
-                        .HasColumnType("varchar(6)");
+                    b.Property<int>("PhoneNumberId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
+                    b.HasIndex("PhoneNumberId");
+
                     b.ToTable("Contacts");
+                });
+
+            modelBuilder.Entity("Infrastructure.Entities.PhoneNumberEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("varchar(11)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PhoneNumbers");
+                });
+
+            modelBuilder.Entity("Infrastructure.Entities.ContactEntity", b =>
+                {
+                    b.HasOne("Infrastructure.Entities.AddressEntity", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Infrastructure.Entities.PhoneNumberEntity", "PhoneNumber")
+                        .WithMany()
+                        .HasForeignKey("PhoneNumberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+
+                    b.Navigation("PhoneNumber");
                 });
 #pragma warning restore 612, 618
         }
