@@ -3,9 +3,10 @@ using Business.Interfaces;
 
 namespace AddressBookAndShoppingList.LocalServices;
 
-internal class MenuService(IContactService contactService)
+internal class MenuService(IContactService contactService, IProductService productService)
 {
     private readonly IContactService _contactService = contactService;
+    private readonly IProductService _productService = productService;
 
 
     public void Menu()
@@ -15,42 +16,101 @@ internal class MenuService(IContactService contactService)
 
         while (true)
         {
+            //Console.Clear();
             Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1.Add a new contact");
-            Console.WriteLine("2.Add a product to the shopping list");
-            Console.WriteLine("3.Get all contacts");
-            Console.WriteLine("4.Get one contact");
-            Console.WriteLine("5.Update a contact");
-            Console.WriteLine("6.Delete a contact");
-            Console.WriteLine("7.Close the application");
-            Console.WriteLine();
-            Console.WriteLine("Choose an option");
 
-            var option = Console.ReadLine();
+            Console.WriteLine("1.Handle Contacts");
+            Console.WriteLine("2.Handle Shopping List");
+            Console.WriteLine("3.Close application");
 
-            switch (option)
+            var firstOption = Console.ReadLine();
+
+            if (firstOption == "1")
             {
-                case "1":
-                    AddContactOptions();
-                    break;
-                case "2":
-                    AddProductOptions();
-                    break;
-                case "3":
-                    GetAllContactsOption();
-                    break;
-                case "4":
-                    GetOneContactOption();
-                    break;
-                case "5":
-                    UpdateContactOption();
-                    break;
-                case "6":
-                    DeleteContactOption();
-                    break;
-                case "7":
-                    CloseApplicationOption();
-                    break;
+                Console.Clear();
+                Console.WriteLine("ContactList");
+                Console.WriteLine("-------------");
+                Console.WriteLine("1.Add a new contact");
+                Console.WriteLine("2.Get all contacts");
+                Console.WriteLine("3.Get one contact");
+                Console.WriteLine("4.Update a contact");
+                Console.WriteLine("5.Delete a contact");
+                Console.WriteLine("6.Close the application");
+                Console.WriteLine();
+                Console.WriteLine("Choose an option");
+
+                var option = Console.ReadLine();
+
+                switch (option)
+                {
+                    case "1":
+                        Console.Clear();
+                        AddContactOptions();
+                        break;
+                    case "2":
+                        Console.Clear();
+                        GetAllContactsOption();
+                        break;
+                    case "3":
+                        Console.Clear();
+                        GetOneContactOption();
+                        break;
+                    case "4":
+                        Console.Clear();
+                        UpdateContactOption();
+                        break;
+                    case "5":
+                        Console.Clear();
+                        DeleteContactOption();
+                        break;
+                    case "6":
+                        CloseApplicationOption();
+                        break;
+                }
+            }
+            else if (firstOption == "2")
+            { 
+                Console.WriteLine("1.Add to shopping list");
+                Console.WriteLine("2.See shopping list");
+                Console.WriteLine("3.See one product");
+                Console.WriteLine("4.Update a item in the shopping list");
+                Console.WriteLine("5.Delete a item");
+                Console.WriteLine("6.Close the application");
+                Console.WriteLine();
+                Console.WriteLine("Choose an option");
+
+                var option = Console.ReadLine();
+
+                switch (option)
+                {
+                    case "1":
+                        Console.Clear();
+                        AddProductOptions();
+                        break;
+                    case "2":
+                        Console.Clear();
+                        GetShoppingListOption();
+                        break;
+                    case "3":
+                        Console.Clear();
+                        GetOneProductOption();
+                        break;
+                    case "4":
+                        Console.Clear();
+                        UpdateProductOption();
+                        break;
+                    case "5":
+                        Console.Clear();
+                        DeleteProductOption();
+                        break;
+                    case "6":
+                        CloseApplicationOption();
+                        break;
+                }
+            } 
+            else
+            {
+                CloseApplicationOption();
             }
         }
     }
@@ -91,19 +151,21 @@ internal class MenuService(IContactService contactService)
 
     public void AddProductOptions()
     {
-        //var product = new ProductDto();
+        var product = new ProductDto();
 
-        //Console.WriteLine("Add Product to shopping list");
-        //Console.WriteLine("-------------");
+        Console.WriteLine("Add Product to shopping list");
+        Console.WriteLine("-------------");
 
-        //Console.Write("Name: ");
-        //product.Title = Console.ReadLine()!;
+        Console.Write("Name: ");
+        product.ProductName = Console.ReadLine()!;
 
-        //Console.Write("Price: ");
-        //product.Price = decimal.Parse(Console.ReadLine()!);
+        Console.Write("Price: ");
+        product.Price = decimal.Parse(Console.ReadLine()!);
 
-        //Console.Write("Store: ");
-        //product.StoreName = Console.ReadLine()!;
+        Console.Write("Store: ");
+        product.StoreName = Console.ReadLine()!;
+
+        _productService.CreateProduct(product);
     }
 
     public void GetAllContactsOption()
@@ -131,6 +193,29 @@ internal class MenuService(IContactService contactService)
         }
     }
 
+    public void GetShoppingListOption()
+    {
+        var products = _productService.GetAll() ?? new List<ProductDto>();
+
+        Console.WriteLine("All products");
+        Console.WriteLine("--------------");
+
+        if (products == null)
+        {
+            Console.WriteLine("No products found");
+            Console.WriteLine("\n");
+        }
+        else
+        {
+            foreach(var product in products)
+            {
+                Console.WriteLine($"Store: {product.StoreName}");
+                Console.WriteLine($"Products in shopping list: {product.ProductName} {product.Price}");
+                Console.WriteLine("\n");
+            }
+        }
+    }
+
     public void GetOneContactOption()
     {
         Console.WriteLine("Show Contact");
@@ -150,6 +235,27 @@ internal class MenuService(IContactService contactService)
             Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
             Console.WriteLine($"{contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
             Console.WriteLine("\n\n");
+        }
+    }
+
+    public void GetOneProductOption()
+    {
+        Console.WriteLine("Show product");
+        Console.WriteLine("---------------");
+
+        Console.WriteLine("Enter the Product name of the product you want to see: ");
+        string productName = Console.ReadLine()!;
+        ProductDto product = _productService.GetOne(productName);
+
+        if (product == null)
+        {
+            Console.WriteLine("Can't find a product with that name");
+        }
+        else
+        {
+            Console.WriteLine($"Product and price: {product.ProductName} {product.Price}");
+            Console.WriteLine($"Store: {product.StoreName}");
+            Console.WriteLine("\n");
         }
     }
 
@@ -200,6 +306,33 @@ internal class MenuService(IContactService contactService)
         _contactService.Update(updatedContactDto);
     }
 
+    public void UpdateProductOption()
+    {
+        Console.WriteLine("Update a product");
+        Console.WriteLine("---------------");
+
+        Console.Write("Enter the ProductName of the product to update: ");
+        string existingProduct = Console.ReadLine()!;
+
+        Console.Write("Enter a new product name: ");
+        string productName = Console.ReadLine()!;
+
+        Console.Write("Enter a new price: ");
+        decimal price = decimal.Parse(Console.ReadLine()!);
+
+        Console.Write("Enter a new store name: ");
+        string storeName = Console.ReadLine()!;
+
+        var updatedProductDto = new ProductDto
+        {
+            ProductName = productName,
+            Price = price,
+            StoreName = storeName
+        };
+
+        _productService.Update(updatedProductDto);
+    }
+
     public void DeleteContactOption()
     {
         Console.WriteLine("Remove Contact");
@@ -216,6 +349,26 @@ internal class MenuService(IContactService contactService)
         {
             Console.WriteLine("The contact is now removed");
             _contactService.Remove(email);
+
+        }
+    }
+
+    public void DeleteProductOption()
+    {
+        Console.WriteLine("Remove Product");
+        Console.WriteLine("---------------");
+
+        Console.WriteLine("Enter the ProductName of the product you want to remove: ");
+        string productName = Console.ReadLine()!;
+
+        if (productName == null)
+        {
+            Console.WriteLine("Can't find a product with that name");
+        }
+        else
+        {
+            Console.WriteLine("The product is now removed");
+            _productService.Remove(productName);
 
         }
     }
