@@ -103,19 +103,22 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
     {
         try
         {
-            var existingContact = _contactRepository.GetOne(contact => contact.Email == updatedContactDto.Email);
-            if (existingContact != null)
+            if (_contactRepository.Exists(x => x.Email == updatedContactDto.Email))
             {
-                existingContact.FirstName = updatedContactDto.FirstName;
-                existingContact.LastName = updatedContactDto.LastName;
-                existingContact.Email = updatedContactDto.Email;
-                existingContact.Address!.StreetName = updatedContactDto.StreetName;
-                existingContact.Address!.StreetNumber = updatedContactDto.StreetNumber;
-                existingContact.Address.PostalCode = updatedContactDto.PostalCode;
-                existingContact.Address.City = updatedContactDto.City;
-                existingContact.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
+                var existingContact = _contactRepository.GetOne(contact => contact.Email == updatedContactDto.Email);
+                if (existingContact != null)
+                {
+                    existingContact.FirstName = updatedContactDto.FirstName;
+                    existingContact.LastName = updatedContactDto.LastName;
+                    existingContact.Email = updatedContactDto.Email;
+                    existingContact.Address!.StreetName = updatedContactDto.StreetName;
+                    existingContact.Address!.StreetNumber = updatedContactDto.StreetNumber;
+                    existingContact.Address.PostalCode = updatedContactDto.PostalCode;
+                    existingContact.Address.City = updatedContactDto.City;
+                    existingContact.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
 
-                _contactRepository.Update(existingContact);
+                    _contactRepository.Update(existingContact);
+                }
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }

@@ -1,5 +1,5 @@
-﻿DROP TABLE StoresEntity
-DROP TABLE ProductsEntity
+﻿DROP TABLE ProductsEntity
+DROP TABLE StoresEntity
 
 CREATE TABLE StoresEntity
 (
@@ -9,7 +9,7 @@ CREATE TABLE StoresEntity
 
 CREATE TABLE ProductsEntity
 (
-	Id int not null primary key,
+	Id int not null primary key identity,
 	ProductName nvarchar(50) not null,
 	Price money,
 	StoreId int null references StoresEntity(Id)

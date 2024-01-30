@@ -31,7 +31,7 @@ public partial class ProductCatalogContext : DbContext
 
             entity.ToTable("ProductsEntity");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Price).HasColumnType("money");
             entity.Property(e => e.ProductName).HasMaxLength(50);
 
