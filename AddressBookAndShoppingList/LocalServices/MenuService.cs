@@ -16,7 +16,7 @@ internal class MenuService(IContactService contactService, IProductService produ
 
         while (true)
         {
-            //Console.Clear();
+            Console.WriteLine("\n");
             Console.WriteLine("What do you want to do?");
 
             Console.WriteLine("1.Handle Contacts");
@@ -268,7 +268,15 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("---------------");
 
         Console.Write("Enter the Email of the contact to update: ");
-        string existingEmail = Console.ReadLine()!;
+        string email = Console.ReadLine()!;
+
+        ContactDto existingContact = _contactService.GetOne(email);
+        if (existingContact == null)
+        {
+            Console.WriteLine("\n");
+            Console.WriteLine("A contact with this email does not exist");
+            return;
+        }
 
         Console.Write("Enter a new first name: ");
         string firstName = Console.ReadLine()!;
@@ -277,7 +285,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         string lastName = Console.ReadLine()!;
 
         Console.Write("Enter a new email: ");
-        string email = Console.ReadLine()!;
+        string emailAddress = Console.ReadLine()!;
 
         Console.Write("Enter a new phone number: ");
         string phoneNumber = Console.ReadLine()!;
@@ -298,7 +306,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         {
             FirstName = firstName,
             LastName = lastName,
-            Email = email,
+            Email = emailAddress,
             PhoneNumber = phoneNumber,
             StreetName = streetName,
             StreetNumber = streetNumber,
@@ -315,7 +323,15 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("---------------");
 
         Console.Write("Enter the ProductName of the product to update: ");
-        string existingProduct = Console.ReadLine()!;
+        string product = Console.ReadLine()!;
+
+        ProductDto existingProduct = _productService.GetOne(product);
+        if (existingProduct == null)
+        {
+            Console.WriteLine("\n");
+            Console.WriteLine("There is no product with that name on the list!");
+            return;
+        }
 
         Console.Write("Enter a new product name: ");
         string productName = Console.ReadLine()!;
