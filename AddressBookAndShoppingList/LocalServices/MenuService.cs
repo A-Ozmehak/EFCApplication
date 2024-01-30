@@ -70,6 +70,9 @@ internal class MenuService(IContactService contactService, IProductService produ
             }
             else if (firstOption == "2")
             { 
+                Console.Clear();
+                Console.WriteLine("ShoppingList");
+                Console.WriteLine("-------------");
                 Console.WriteLine("1.Add to shopping list");
                 Console.WriteLine("2.See shopping list");
                 Console.WriteLine("3.See one product");
@@ -210,7 +213,7 @@ internal class MenuService(IContactService contactService, IProductService produ
             foreach(var product in products)
             {
                 Console.WriteLine($"Store: {product.StoreName}");
-                Console.WriteLine($"Products in shopping list: {product.ProductName} {product.Price}");
+                Console.WriteLine($"Products in shopping list: {product.ProductName} {product.Price} kr");
                 Console.WriteLine("\n");
             }
         }
@@ -253,7 +256,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         }
         else
         {
-            Console.WriteLine($"Product and price: {product.ProductName} {product.Price}");
+            Console.WriteLine($"Product and price: {product.ProductName} {product.Price} kr");
             Console.WriteLine($"Store: {product.StoreName}");
             Console.WriteLine("\n");
         }

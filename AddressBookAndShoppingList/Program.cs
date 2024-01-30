@@ -7,6 +7,7 @@ using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var builder = Host.CreateDefaultBuilder().ConfigureServices(services =>
 {
@@ -26,7 +27,15 @@ var builder = Host.CreateDefaultBuilder().ConfigureServices(services =>
 
     services.AddSingleton<MenuService>();
 
-}).Build();
+}).ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+    logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+})
+    .Build();
+
+
 
 builder.Start();
 
