@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ContactContext))]
-    [Migration("20240126220415_CreateTables")]
-    partial class CreateTables
+    [Migration("20240130133929_Create_new_Tables")]
+    partial class Create_new_Tables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

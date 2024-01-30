@@ -5,7 +5,7 @@
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class TablesAdded : Migration
+    public partial class Create_new_Tables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,8 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Address = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    StreetName = table.Column<string>(type: "nvarchar(50)", nullable: true),
+                    StreetNumber = table.Column<string>(type: "nvarchar(10)", nullable: true),
                     PostalCode = table.Column<string>(type: "varchar(6)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(50)", nullable: true)
                 },

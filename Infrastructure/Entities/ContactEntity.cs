@@ -28,6 +28,4 @@ public class ContactEntity
     [Required]
     public int PhoneNumberId { get; set; }
     public PhoneNumberEntity PhoneNumber { get; set; } = null!;
-
-
 }

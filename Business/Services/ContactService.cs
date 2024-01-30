@@ -33,7 +33,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                     LastName = contact.LastName,
                     Email = contact.Email,
                     AddressId = addressEntity.Id,
-                    PhoneNumberId = phoneNumberEntity.Id                
+                    PhoneNumberId = phoneNumberEntity.Id
                 };
 
                 var result = _contactRepository.Create(contactEntity);

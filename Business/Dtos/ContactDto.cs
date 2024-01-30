@@ -1,4 +1,6 @@
-﻿namespace Business.Dtos;
+﻿using Infrastructure.Entities;
+
+namespace Business.Dtos;
 
 public class ContactDto
 {
@@ -12,4 +14,21 @@ public class ContactDto
     public string? PostalCode { get; set; }
     public string? City { get; set; }
     public string PhoneNumber { get; set; } = null!;
+
+
+    public static implicit operator ContactDto(ContactEntity entity)
+    {
+        var contactDto = new ContactDto
+        {
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            Email = entity.Email,
+            StreetName = entity.Address?.StreetName,
+            StreetNumber = entity.Address?.StreetNumber,
+            PostalCode = entity.Address?.PostalCode,
+            City = entity.Address?.City,
+            PhoneNumber = entity.PhoneNumber.PhoneNumber
+        };
+        return contactDto;
+    }
 }

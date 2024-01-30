@@ -35,8 +35,6 @@ var builder = Host.CreateDefaultBuilder().ConfigureServices(services =>
 })
     .Build();
 
-
-
 builder.Start();
 
 var menuService = builder.Services.GetRequiredService<MenuService>();
