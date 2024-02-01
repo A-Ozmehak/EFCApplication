@@ -20,9 +20,6 @@ public partial class ProductCatalogContext : DbContext
 
     public virtual DbSet<StoresEntity> StoresEntities { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Anna\\Documents\\Repos\\EFCApplication\\Infrastructure\\Data\\ProductCatalog.mdf;Integrated Security=True;Connect Timeout=30");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProductsEntity>(entity =>

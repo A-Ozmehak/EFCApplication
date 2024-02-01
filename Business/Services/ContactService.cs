@@ -15,6 +15,11 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
     private readonly IAddressRepository _addressRepository = addressRepository;
     private readonly IPhoneNumberRepository _phoneNumberRepository = phoneNumberRepository;
 
+    /// <summary>
+    /// Creates a new contact in the repository. If address or phone number does not exist, it creates them as well.
+    /// </summary>
+    /// <param name="contact">The contact data object that contains the details of the contact to be created</param>
+    /// <returns>Returns true if the contact is created, otherwise false</returns>
     public bool CreateContact(ContactDto contact)
     {
         try
