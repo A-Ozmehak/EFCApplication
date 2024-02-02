@@ -90,10 +90,16 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
                 return false;
             }
 
+            var storeEntity = _storeRepository.GetOne(x => x.StoreName == updatedProductDto.StoreName);
+            if (storeEntity == null) 
+            {
+                storeEntity = new StoresEntity { StoreName = updatedProductDto.StoreName };
+                _storeRepository.Create(storeEntity);
+            }
+            
             existingProduct.ProductName = updatedProductDto.ProductName;
             existingProduct.Price = updatedProductDto.Price;
-            existingProduct.Store.StoreName = updatedProductDto.StoreName;
-
+            existingProduct.StoreId = storeEntity.Id;
 
             _productRepository.Update(existingProduct);
             return true;
