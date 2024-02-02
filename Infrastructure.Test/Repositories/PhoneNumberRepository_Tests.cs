@@ -132,4 +132,33 @@ public class PhoneNumberRepository_Tests
         Assert.NotNull(result);
         Assert.Equal(phoneNumberEntity.PhoneNumber, result.PhoneNumber);
     }
+
+    [Fact]
+    public void Exists_ShouldCheckIfPhoneNumberExists_ReturnTrueIfPhoneNumberExists()
+    {
+        // Arrange
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        var phoneNumberEntity = new PhoneNumberEntity { PhoneNumber = "0793555635" };
+        phoneNumberRepository.Create(phoneNumberEntity);
+
+        // Act
+        bool exists = phoneNumberRepository.Exists(x => x.Id == phoneNumberEntity.Id);
+
+        // Assert
+        Assert.True(exists);
+    }
+
+    [Fact]
+    public void Exists_ShouldReturnFalse_WhenPhoneNumberDoesNotExist()
+    {
+        // Arrange
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        int nonExistentPhoneNumberId = 999;
+
+        // Act
+        bool exists = phoneNumberRepository.Exists(x => x.Id == nonExistentPhoneNumberId);
+
+        // Assert
+        Assert.False(exists);
+    }
 }

@@ -1,8 +1,13 @@
-﻿using Infrastructure.Contexts;
+﻿using Business.Dtos;
+using Business.Interfaces;
+using Business.Services;
+using Infrastructure.Contexts;
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System.Linq.Expressions;
 
 namespace Business.Test.Services;
 
@@ -14,130 +19,189 @@ public class ProductService_Tests
         .Options);
 
     [Fact]
-    public void Create_ShouldCreateProductToRepository_ReturnProduct()
+    public void Create_ShouldCreateProductAndSaveProduct_ReturnTrue()
     {
         // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var productDto = new ProductDto { ProductName = "Milk", Price = 23, StoreName = "Willys" };
+
+        mockStoreRepository.Setup(x => x.Create(It.IsAny<StoresEntity>())).Returns(new StoresEntity());
+        mockProductRepository.Setup(x => x.Create(It.IsAny<ProductsEntity>())).Returns(new ProductsEntity());
 
         // Act
-        var result = productRepository.Create(productEntity);
-
-        // Assert
-        Assert.NotNull(result);
-    }
-
-    [Fact]
-    public void Create_ShouldNotCreateProductToRepository_ReturnNull()
-    {
-        // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity();
-        var productEntity = new ProductsEntity();
-
-        // Act
-        var result = productRepository.Create(productEntity);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void Get_ShouldGetAllProducts_ReturnIEnumerableOfTypeProducts()
-    {
-        // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };   
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
-        productRepository.Create(productEntity);
-
-        // Act
-        var result = productRepository.GetAll();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.IsAssignableFrom<IEnumerable<ProductsEntity>>(result);
-    }
-
-    [Fact]
-    public void Get_ShouldFindOneProductMyProductName_ReturnOneProduct()
-    {
-        // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
-        productRepository.Create(productEntity);
-
-        // Act
-        var result = productRepository.GetOne(x => x.ProductName == productEntity.ProductName);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(productEntity.ProductName, result.ProductName);
-    }
-
-    [Fact]
-    public void Get_ShouldNotFindOneProductByProductName_ReturnNull()
-    {
-        // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
-
-        // Act
-        var result = productRepository.GetOne(x => x.ProductName == productEntity.ProductName);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public void Delete_ShouldRemoveOneProduct_ReturnTrue()
-    {
-        // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
-        productRepository.Create(productEntity);
-
-        // Act
-        var result = productRepository.Delete(x => x.ProductName == productEntity.ProductName);
+        bool result = productService.CreateProduct(productDto);
 
         // Assert
         Assert.True(result);
     }
 
     [Fact]
-    public void Delete_ShouldNotFindProductAndRemoveIt_ReturnFalse()
+    public void Create_ShouldNotCreateAndSaveProduct_ReturnFalse()
     {
         // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var productDto = new ProductDto { ProductName = "Milk", Price = 23, StoreName = "Willys" };
 
         // Act
-        var result = productRepository.Delete(x => x.ProductName == productEntity.ProductName);
+        var result = productService.CreateProduct(productDto);
 
         // Assert
         Assert.False(result);
     }
 
     [Fact]
-    public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedContactEntity()
+    public void Get_ShouldGetAllProducts_ReturnIEnumerableOfTypeProducts()
     {
         // Arrange
-        IProductRepository productRepository = new ProductRepository(_context);
-        var storeEntity = new StoresEntity { StoreName = "Coop" };
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = storeEntity };
-        productRepository.Create(productEntity);
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var products = new List<ProductsEntity>
+        {
+            new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Willys" } },
+            new ProductsEntity {  ProductName = "Bread", Price = 15, Store = new StoresEntity { StoreName = "Coop" }},
+        };
+
+        mockProductRepository.Setup(x => x.GetAll()).Returns(products);
 
         // Act
-        productEntity.ProductName = "Bread";
-        var result = productRepository.Update(productEntity);
+        var result = productService.GetAll();
+
+        // Assert
+        Assert.Equal(2, result.Count());
+        Assert.Contains(result, r => r.ProductName == "Milk" && r.Price == 23 && r.StoreName == "Willys");
+        Assert.Contains(result, r => r.ProductName == "Bread" && r.Price == 15 && r.StoreName == "Coop");
+    }
+
+    [Fact]
+    public void Get_ShouldFindOneProductMyProductName_ReturnOneProduct()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Coop" } };
+
+        mockProductRepository.Setup(x => x.GetOneByProductName(productEntity.ProductName)).Returns(productEntity);
+
+        // Act
+        var result = productService.GetOne(productEntity.ProductName);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(productEntity.ProductName, result.ProductName);
+        Assert.Equal(productEntity.Price, result.Price);
+        Assert.Equal(productEntity.Store.StoreName, result.StoreName);
     }
+
+    [Fact]
+    public void Get_ShouldNotFindOneProductByProductName_ReturnNull()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var nonExistentProductName = "Milk";
+
+        mockProductRepository.Setup(x => x.GetOneByProductName(nonExistentProductName)).Returns((ProductsEntity)null);
+
+        // Act
+        var result = productService.GetOne(nonExistentProductName);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void Remove_ShouldRemoveOneProduct_ReturnTrue()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Willys"} };
+
+        mockProductRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>())).Returns(productEntity);
+        mockProductRepository.Setup(x => x.Delete(It.Is<Expression<Func<ProductsEntity, bool>>>(predicate => predicate.Compile()(productEntity)))).Returns(true);
+
+        // Act
+        var result = productService.Remove(productEntity.ProductName);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Remove_ShouldNotFindProductAndRemoveIt_ReturnFalse()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var nonExistingProductName = "Ketchup";
+
+        mockProductRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>())).Returns((ProductsEntity)null);
+
+
+        // Act
+        productService.Remove(nonExistingProductName);
+
+        // Assert
+        mockProductRepository.Verify(x => x.Delete(It.IsAny<Expression<Func<ProductsEntity, bool>>>()), Times.Never);
+    }
+
+    [Fact]
+    public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedProductEntity()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Willys" } };
+        var productDto = new ProductDto { ProductName = "Bread", Price = 15, StoreName = "Coop" };
+
+        mockProductRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>())).Returns(productEntity);
+        mockProductRepository.Setup(x => x.Update(It.IsAny<ProductsEntity>())).Callback<ProductsEntity>(c => productEntity = c);
+
+        // Act
+        var result = productService.Update(productDto);
+
+        // Assert
+        Assert.Equal(productDto.ProductName, productEntity.ProductName);
+        Assert.Equal(productDto.Price, productEntity.Price);
+        Assert.Equal(productDto.StoreName, productEntity.Store.StoreName);
+    }
+
+    [Fact]
+    public void Update_ShouldNotUpdateProduct_WhenProductDoesNotExist()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var nonExistentProductDto = new ProductDto { ProductName = "Non", Price = 1, StoreName = "Existent" };
+
+        mockProductRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>())).Returns((ProductsEntity)null);
+
+        // Act
+        var result = productService.Update(nonExistentProductDto);
+
+        // Assert
+        Assert.False(result);
+        mockProductRepository.Verify(x => x.Update(It.IsAny<ProductsEntity>()), Times.Never);
+    }
+
 }

@@ -64,7 +64,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
     {
         try
         {
-            var product = _productRepository.GetOne(x => x.ProductName == productName);
+            var product = _productRepository.GetOneByProductName(productName);
             if (product != null)
             {
                 return new ProductDto
@@ -80,25 +80,29 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         return null!;
     }
 
-    public void Update(ProductDto updatedProductDto)
+    public bool Update(ProductDto updatedProductDto)
     {
         try
         {
             var existingProduct = _productRepository.GetOne(contact => contact.ProductName == updatedProductDto.ProductName);
-            if (existingProduct != null)
+            if (existingProduct == null)
             {
-                existingProduct.ProductName = updatedProductDto.ProductName;
-                existingProduct.Price = updatedProductDto.Price;
-                existingProduct.Store.StoreName = updatedProductDto.StoreName;
-
-
-                _productRepository.Update(existingProduct);
+                return false;
             }
+
+            existingProduct.ProductName = updatedProductDto.ProductName;
+            existingProduct.Price = updatedProductDto.Price;
+            existingProduct.Store.StoreName = updatedProductDto.StoreName;
+
+
+            _productRepository.Update(existingProduct);
+            return true;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return false;
     }
 
-    public void Remove(string productName)
+    public bool Remove(string productName)
     {
         try
         {
@@ -107,9 +111,10 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
             if (contact != null)
             {
                 _productRepository.Delete(x => x.ProductName == productName);
+                return true;    
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-
+        return false;
     }
 }

@@ -15,11 +15,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
     private readonly IAddressRepository _addressRepository = addressRepository;
     private readonly IPhoneNumberRepository _phoneNumberRepository = phoneNumberRepository;
 
-    /// <summary>
-    /// Creates a new contact in the repository. If address or phone number does not exist, it creates them as well.
-    /// </summary>
-    /// <param name="contact">The contact data object that contains the details of the contact to be created</param>
-    /// <returns>Returns true if the contact is created, otherwise false</returns>
+    
     public bool CreateContact(ContactDto contact)
     {
         try
@@ -104,32 +100,33 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
         return null!;
     }
 
-    public void Update(ContactDto updatedContactDto)
+    public bool Update(ContactDto updatedContactDto)
     {
         try
         {
-            if (_contactRepository.Exists(x => x.Email == updatedContactDto.Email))
+            var contactEntity = _contactRepository.GetOne(c => c.Email == updatedContactDto.Email);
+            if (contactEntity == null)
             {
-                var existingContact = _contactRepository.GetOne(contact => contact.Email == updatedContactDto.Email);
-                if (existingContact != null)
-                {
-                    existingContact.FirstName = updatedContactDto.FirstName;
-                    existingContact.LastName = updatedContactDto.LastName;
-                    existingContact.Email = updatedContactDto.Email;
-                    existingContact.Address!.StreetName = updatedContactDto.StreetName;
-                    existingContact.Address!.StreetNumber = updatedContactDto.StreetNumber;
-                    existingContact.Address.PostalCode = updatedContactDto.PostalCode;
-                    existingContact.Address.City = updatedContactDto.City;
-                    existingContact.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
-
-                    _contactRepository.Update(existingContact);
-                }
+                return false;
             }
+
+            contactEntity.FirstName = updatedContactDto.FirstName;
+            contactEntity.LastName = updatedContactDto.LastName;
+            contactEntity.Email = updatedContactDto.Email;
+            contactEntity.Address.StreetName = updatedContactDto.StreetName;
+            contactEntity.Address.StreetNumber = updatedContactDto.StreetNumber;
+            contactEntity.Address.PostalCode = updatedContactDto.PostalCode;
+            contactEntity.Address.City = updatedContactDto.City;
+            contactEntity.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
+
+            _contactRepository.Update(contactEntity);
+            return true;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return false;
     }
 
-    public void Remove(string email)
+    public bool Remove(string email)
     {
         try
         {
@@ -138,9 +135,10 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
             if (contact != null)
             {
                 _contactRepository.Delete(x => x.Email == email);
+                return true;
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-
+        return false;
     }
 }

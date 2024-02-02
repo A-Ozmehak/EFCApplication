@@ -14,7 +14,7 @@ public class StoreRepository_Tests
            .Options);
 
     [Fact]
-    public void Create_ShouldCreateAndSaveProductToDatabase_ReturnProduct()
+    public void Create_ShouldCreateAndSaveStoreToDatabase_ReturnStore()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -28,7 +28,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Create_ShouldNotSaveProductToDatabase_ReturnNull()
+    public void Create_ShouldNotSaveStoreToDatabase_ReturnNull()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -42,7 +42,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldGetAllProducts_ReturnIEnumerableOfTypeProductsEntity()
+    public void Get_ShouldGetAllStores_ReturnIEnumerableOfTypeStoresEntity()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -58,7 +58,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldFindOneProductMyProductName_ReturnOneProduct()
+    public void Get_ShouldFindOneStoreByStoreName_ReturnOneStore()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -74,7 +74,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldNotFindOneProductByProductName_ReturnNull()
+    public void Get_ShouldNotFindOneStoreByStoreName_ReturnNull()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -88,7 +88,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Delete_ShouldRemoveOneProduct_ReturnTrue()
+    public void Delete_ShouldRemoveOneStore_ReturnTrue()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -103,7 +103,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Delete_ShouldNotFindProductAndRemoveIt_ReturnFalse()
+    public void Delete_ShouldNotFindStoreAndRemoveIt_ReturnFalse()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -117,7 +117,7 @@ public class StoreRepository_Tests
     }
 
     [Fact]
-    public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedContactEntity()
+    public void Update_ShouldUpdateExistingStoresEntity_ReturnUpdatedStoresEntity()
     {
         // Arrange
         IStoreRepository storeRepository = new StoreRepository(_context);
@@ -131,5 +131,34 @@ public class StoreRepository_Tests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(storeEntity.StoreName, result.StoreName);
+    }
+
+    [Fact]
+    public void Exists_ShouldCheckIfStoreExists_ReturnTrueIfStoreExists()
+    {
+        // Arrange
+        IStoreRepository storeRepository = new StoreRepository(_context);
+        var storeEntity = new StoresEntity { StoreName = "Willys" };
+        storeRepository.Create(storeEntity);
+
+        // Act
+        bool exists = storeRepository.Exists(x => x.Id == storeEntity.Id);
+
+        // Assert
+        Assert.True(exists);
+    }
+
+    [Fact]
+    public void Exists_ShouldReturnFalse_WhenStoreDoesNotExist()
+    {
+        // Arrange
+        IStoreRepository storeRepository = new StoreRepository(_context);
+        int nonExistentStoreId = 999;
+
+        // Act
+        bool exists = storeRepository.Exists(x => x.Id == nonExistentStoreId);
+
+        // Assert
+        Assert.False(exists);
     }
 }

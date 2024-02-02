@@ -74,7 +74,7 @@ public class AddressRepository_Tests
     }
 
     [Fact]
-    public void Delete_ShouldRemoveOneContact_ReturnTrue()
+    public void Delete_ShouldRemoveOneAddress_ReturnTrue()
     {
         // Arrange
         IAddressRepository addressRepository = new AddressRepository(_context);
@@ -89,7 +89,7 @@ public class AddressRepository_Tests
     }
 
     [Fact]
-    public void Delete_ShouldNotFindContactAndRemoveIt_ReturnFalse()
+    public void Delete_ShouldNotFindAddressAndRemoveIt_ReturnFalse()
     {
         // Arrange
         IAddressRepository addressRepository = new AddressRepository(_context);
@@ -103,7 +103,7 @@ public class AddressRepository_Tests
     }
 
     [Fact]
-    public void Update_ShouldUpdateExistingContactEntity_ReturnUpdatedContactEntity()
+    public void Update_ShouldUpdateExistingAddressEntity_ReturnUpdatedAddressEntity()
     {
         // Arrange
         IAddressRepository addressRepository = new AddressRepository(_context);

@@ -21,7 +21,7 @@ public class ProductRepository : Repository<ProductsEntity, ProductCatalogContex
             .ToList();
     }
 
-    public ProductsEntity GetOne(string productName)
+    public ProductsEntity GetOneByProductName(string productName)
     {
         return _context.ProductsEntities
             .Include(product => product.Store)

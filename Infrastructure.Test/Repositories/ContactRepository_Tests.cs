@@ -134,4 +134,33 @@ public class ContactRepository_Tests
         Assert.Equal(contactEntity.FirstName, result.FirstName);
         Assert.Equal(contactEntity.Email, result.Email);
     }
+    
+    [Fact]
+    public void Exists_ShouldCheckIfContactExists_ReturnTrueIfContactExists()
+    {
+        // Arrange
+        IContactRepository contactRepository = new ContactRepository(_context);
+        var contactEntity = new ContactEntity { FirstName = "Anna", LastName = "Ozmehak", Email = "anna.ozmehak@gmail.com" };
+        contactRepository.Create(contactEntity);
+
+        // Act
+        bool exists = contactRepository.Exists(x => x.Id == contactEntity.Id);
+
+        // Assert
+        Assert.True(exists);
+    }
+
+    [Fact]
+    public void Exists_ShouldReturnFalse_WhenContactDoesNotExist()
+    {
+        // Arrange
+        IContactRepository contactRepository = new ContactRepository(_context);
+        int nonExistentContactId = 999;
+
+        // Act
+        bool exists = contactRepository.Exists(x => x.Id == nonExistentContactId);
+
+        // Assert
+        Assert.False(exists);
+    }
 }
