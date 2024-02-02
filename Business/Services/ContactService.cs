@@ -20,15 +20,16 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
     {
         try
         {
-            if (!_contactRepository.Exists(x => x.Email == contact.Email))
-            {
-                var addressEntity = _addressRepository.GetOne(x => x.StreetName == contact.StreetName);
-                addressEntity ??= _addressRepository.Create(new AddressEntity { StreetName = contact.StreetName, StreetNumber = contact.StreetNumber, PostalCode = contact.PostalCode, City = contact.City });
+            var addressEntity = _addressRepository.GetOne(x => x.StreetName == contact.StreetName && x.StreetNumber == contact.StreetNumber && x.PostalCode == contact.PostalCode && x.City == contact.City);
+            addressEntity ??= _addressRepository.Create(new AddressEntity { StreetName = contact.StreetName, StreetNumber = contact.StreetNumber, PostalCode = contact.PostalCode, City = contact.City });
 
-                var phoneNumberEntity = _phoneNumberRepository.GetOne(x => x.PhoneNumber == contact.PhoneNumber);
-                phoneNumberEntity ??= _phoneNumberRepository.Create(new PhoneNumberEntity { PhoneNumber = contact.PhoneNumber });
+            var phoneNumberEntity = _phoneNumberRepository.GetOne(x => x.PhoneNumber == contact.PhoneNumber);
+            phoneNumberEntity ??= _phoneNumberRepository.Create(new PhoneNumberEntity { PhoneNumber = contact.PhoneNumber });
+            //if (!_contactRepository.Exists(x => x.Email == contact.Email))
+            //{
 
-                var contactEntity = new ContactEntity
+
+            var contactEntity = new ContactEntity
                 {
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
@@ -42,7 +43,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                 {
                     return true;
                 }
-            }
+            //}
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
         return false;
@@ -110,14 +111,27 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                 return false;
             }
 
+            var newAddress = new AddressEntity
+            {
+                StreetName = updatedContactDto.StreetName,
+                StreetNumber = updatedContactDto.StreetNumber,
+                PostalCode = updatedContactDto.PostalCode,
+                City = updatedContactDto.City
+            };
+            _addressRepository.Create(newAddress);
+
+            var phoneNumberEntity = _phoneNumberRepository.GetOne(p => p.PhoneNumber == updatedContactDto.PhoneNumber);
+            if (phoneNumberEntity == null)
+            {
+                phoneNumberEntity = new PhoneNumberEntity { PhoneNumber = updatedContactDto.PhoneNumber };
+                _phoneNumberRepository.Create(phoneNumberEntity);
+            }
+
             contactEntity.FirstName = updatedContactDto.FirstName;
             contactEntity.LastName = updatedContactDto.LastName;
             contactEntity.Email = updatedContactDto.Email;
-            contactEntity.Address.StreetName = updatedContactDto.StreetName;
-            contactEntity.Address.StreetNumber = updatedContactDto.StreetNumber;
-            contactEntity.Address.PostalCode = updatedContactDto.PostalCode;
-            contactEntity.Address.City = updatedContactDto.City;
-            contactEntity.PhoneNumber.PhoneNumber = updatedContactDto.PhoneNumber;
+            contactEntity.AddressId = newAddress.Id;
+            contactEntity.PhoneNumberId = phoneNumberEntity.Id;
 
             _contactRepository.Update(contactEntity);
             return true;

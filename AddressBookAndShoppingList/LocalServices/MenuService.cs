@@ -234,6 +234,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         }
         else
         {
+            Console.Clear();
             Console.WriteLine($"{contact.FirstName} {contact.LastName}");
             Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
             Console.WriteLine($"{contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
@@ -333,6 +334,7 @@ internal class MenuService(IContactService contactService, IProductService produ
             return;
         }
 
+        Console.Clear();
         Console.Write("Enter a new product name: ");
         string productName = Console.ReadLine()!;
 
