@@ -42,7 +42,7 @@ public class ProductRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldGetAllProducts_ReturnIEnumerableOfTypeProductsEntity()
+    public void GetAll_ShouldGetAllProducts_ReturnIEnumerableOfTypeProductsEntity()
     {
         // Arrange
         IProductRepository productRepository = new ProductRepository(_context);
@@ -58,7 +58,20 @@ public class ProductRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldFindOneProductMyProductName_ReturnOneProduct()
+    public void GetAll_WhenNoProductsExist_ShouldReturnEmptyCollection()
+    {
+        // Arrange
+        IProductRepository productRepository = new ProductRepository(_context);
+
+        // Act
+        var result = productRepository.GetAll();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void GetOneByProductName_ShouldFindOneProductMyProductName_ReturnOneProduct()
     {
         // Arrange
         IProductRepository productRepository = new ProductRepository(_context);
@@ -74,7 +87,7 @@ public class ProductRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldNotFindOneProductByProductName_ReturnNull()
+    public void GetOneByProductName_ShouldNotFindOneProductByProductName_ReturnNull()
     {
         // Arrange
         IProductRepository productRepository = new ProductRepository(_context);
@@ -117,7 +130,7 @@ public class ProductRepository_Tests
     }
 
     [Fact]
-    public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedContactEntity()
+    public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedContactEntity() 
     {
         // Arrange
         IProductRepository productRepository = new ProductRepository(_context);

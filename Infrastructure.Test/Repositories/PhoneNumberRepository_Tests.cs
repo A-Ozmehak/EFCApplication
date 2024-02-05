@@ -58,6 +58,19 @@ public class PhoneNumberRepository_Tests
     }
 
     [Fact]
+    public void Get_WhenNoPhoneNumbersExist_ShouldReturnEmptyCollection()
+    {
+        // Arrange
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+
+        // Act
+        var result = phoneNumberRepository.GetAll();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
     public void Get_ShouldFindOnePhoneNumberByPhoneNumber_ReturnOnePhoneNumber()
     {
         // Arrange

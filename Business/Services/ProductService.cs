@@ -100,7 +100,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
             existingProduct.ProductName = updatedProductDto.ProductName;
             existingProduct.Price = updatedProductDto.Price;
             existingProduct.StoreId = storeEntity.Id;
-
+            existingProduct.Store.StoreName = updatedProductDto.StoreName;
             _productRepository.Update(existingProduct);
             return true;
         }

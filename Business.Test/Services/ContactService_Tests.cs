@@ -86,6 +86,26 @@ public class ContactService_Tests
     }
 
     [Fact]
+    public void GetAll_ShouldGetNoContacts_ReturnEmptyIEnumerable()
+    {
+        // Arrange
+        var mockContactRepository = new Mock<IContactRepository>();
+        var mockAddressRepository = new Mock<IAddressRepository>();
+        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
+        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+
+        var contacts = new List<ContactEntity>();
+
+        mockContactRepository.Setup(x => x.GetAll()).Returns(contacts);
+
+        // Act
+        var result = contactService.GetAll();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
     public void GetOne_ShouldGetOneContactByEmail_ReturnOneContact()
     {
         // Arrange

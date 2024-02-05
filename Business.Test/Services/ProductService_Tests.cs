@@ -56,7 +56,7 @@ public class ProductService_Tests
     }
 
     [Fact]
-    public void Get_ShouldGetAllProducts_ReturnIEnumerableOfTypeProducts()
+    public void GetAll_ShouldGetAllProducts_ReturnIEnumerableOfTypeProducts()
     {
         // Arrange
         var mockProductRepository = new Mock<IProductRepository>();
@@ -78,6 +78,25 @@ public class ProductService_Tests
         Assert.Equal(2, result.Count());
         Assert.Contains(result, r => r.ProductName == "Milk" && r.Price == 23 && r.StoreName == "Willys");
         Assert.Contains(result, r => r.ProductName == "Bread" && r.Price == 15 && r.StoreName == "Coop");
+    }
+
+    [Fact]
+    public void GetAll_ShouldGetNoProducts_ReturnEmptyIEnumerable()
+    {
+        // Arrange
+        var mockProductRepository = new Mock<IProductRepository>();
+        var mockStoreRepository = new Mock<IStoreRepository>();
+        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+
+        var products = new List<ProductsEntity>();
+
+        mockProductRepository.Setup(x => x.GetAll()).Returns(products);
+
+        // Act
+        var result = productService.GetAll();
+
+        // Assert
+        Assert.Empty(result);
     }
 
     [Fact]

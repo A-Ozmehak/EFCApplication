@@ -42,7 +42,7 @@ public class ContactRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldGetAllContacts_ReturnIEnumerableOfTypeContactEntity()
+    public void GetAll_ShouldGetAllContacts_ReturnIEnumerableOfTypeContactEntity()
     {
         // Arrange
         IContactRepository contactRepository = new ContactRepository(_context);
@@ -58,7 +58,20 @@ public class ContactRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldFindOneContactByEmail_ReturnOneContact()
+    public void GetAll_WhenNoContactsExist_ShouldReturnEmptyCollection()
+    {
+        // Arrange
+        IContactRepository contactRepository = new ContactRepository(_context);
+
+        // Act
+        var result = contactRepository.GetAll();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void GetOneByEmail_ShouldFindOneContactByEmail_ReturnOneContact()
     {
         // Arrange
         IContactRepository contactRepository = new ContactRepository(_context);
@@ -74,7 +87,7 @@ public class ContactRepository_Tests
     }
 
     [Fact]
-    public void Get_ShouldNotFindOneContactByEmail_ReturnNull()
+    public void GetOneByEmail_ShouldNotFindOneContactByEmail_ReturnNull()
     {
         // Arrange
         IContactRepository contactRepository = new ContactRepository(_context);
@@ -134,7 +147,7 @@ public class ContactRepository_Tests
         Assert.Equal(contactEntity.FirstName, result.FirstName);
         Assert.Equal(contactEntity.Email, result.Email);
     }
-    
+
     [Fact]
     public void Exists_ShouldCheckIfContactExists_ReturnTrueIfContactExists()
     {

@@ -58,6 +58,19 @@ public class StoreRepository_Tests
     }
 
     [Fact]
+    public void GetAll_WhenNoStoresExist_ShouldReturnEmptyCollection()
+    {
+        // Arrange
+        IStoreRepository storeRepository = new StoreRepository(_context);
+
+        // Act
+        var result = storeRepository.GetAll();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
     public void Get_ShouldFindOneStoreByStoreName_ReturnOneStore()
     {
         // Arrange
