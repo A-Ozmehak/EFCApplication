@@ -137,10 +137,6 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
             contactEntity.LastName = updatedContactDto.LastName;
             contactEntity.Email = updatedContactDto.Email;
             contactEntity.AddressId = addressEntity.Id;
-            //contactEntity.Address.StreetName = updatedContactDto.StreetName;
-            //contactEntity.Address.StreetNumber = updatedContactDto.StreetNumber;
-            //contactEntity.Address.PostalCode = updatedContactDto.PostalCode;
-            //contactEntity.Address.City = updatedContactDto.City;
             contactEntity.PhoneNumberId = phoneNumberEntity.Id;
             contactEntity.PhoneNumber.PhoneNumber = phoneNumberEntity.PhoneNumber;
 
