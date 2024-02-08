@@ -66,10 +66,13 @@ internal class MenuService(IContactService contactService, IProductService produ
                     case "6":
                         CloseApplicationOption();
                         break;
+                    default:
+                        Console.WriteLine("Invalid input. Please enter a number corresponding to one of the options.");
+                        break;
                 }
             }
             else if (firstOption == "2")
-            { 
+            {
                 Console.Clear();
                 Console.WriteLine("ShoppingList");
                 Console.WriteLine("-------------");
@@ -109,12 +112,17 @@ internal class MenuService(IContactService contactService, IProductService produ
                     case "6":
                         CloseApplicationOption();
                         break;
+                    default:
+                        Console.WriteLine("Invalid input. Please enter a number corresponding to one of the options.");
+                        break;
                 }
-            } 
-            else
+            }
+            else if (firstOption == "3")
             {
                 CloseApplicationOption();
             }
+            else
+                Console.WriteLine("Invalid input. Please enter a number corresponding to one of the options.");
         }
     }
 
