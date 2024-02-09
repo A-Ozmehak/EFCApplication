@@ -2,6 +2,7 @@
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -24,11 +25,18 @@ public class ContactRepository : Repository<ContactEntity, ContactContext>, ICon
             .ToList();
     }
 
-    public ContactEntity GetOneByEmail(string email)
+    public ContactEntity GetOneById(Expression<Func<ContactEntity, bool>> predicate)
     {
-        return _context.Contacts
+        try
+        {
+            var result = _context.Set<ContactEntity>()
             .Include(contact => contact.Address)
             .Include(contact => contact.PhoneNumber)
-            .SingleOrDefault(contact => contact.Email == email)!;
+            .FirstOrDefault(predicate);
+
+            return result!;
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return null!;
     }
 }

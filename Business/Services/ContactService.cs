@@ -16,22 +16,25 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
     private readonly IPhoneNumberRepository _phoneNumberRepository = phoneNumberRepository;
 
     
-    public bool CreateContact(ContactDto contact)
+    public ContactDto CreateContact(ContactDto contact)
     {
         try
         {
-            var addressEntity = _addressRepository.GetOne(x => x.StreetName == contact.StreetName && x.StreetNumber == contact.StreetNumber && x.PostalCode == contact.PostalCode && x.City == contact.City) ??
-            _addressRepository.Create(new AddressEntity { StreetName = contact.StreetName, StreetNumber = contact.StreetNumber, PostalCode = contact.PostalCode, City = contact.City });
-
-            if (addressEntity == null)
+            var result = _contactRepository.GetOne(x => x.Email == contact.Email);
+            if (result == null)
             {
-                throw new Exception("Failed to retrieve or create AddressEntity");
-            }
+                var addressEntity = _addressRepository.GetOne(x => x.StreetName == contact.StreetName && x.StreetNumber == contact.StreetNumber && x.PostalCode == contact.PostalCode && x.City == contact.City) ??
+                _addressRepository.Create(new AddressEntity { StreetName = contact.StreetName, StreetNumber = contact.StreetNumber, PostalCode = contact.PostalCode, City = contact.City });
 
-            var phoneNumberEntity = _phoneNumberRepository.GetOne(x => x.PhoneNumber == contact.PhoneNumber);
-            phoneNumberEntity ??= _phoneNumberRepository.Create(new PhoneNumberEntity { PhoneNumber = contact.PhoneNumber });
+                if (addressEntity == null)
+                {
+                    throw new Exception("Failed to retrieve or create AddressEntity");
+                }
 
-            var contactEntity = new ContactEntity
+                var phoneNumberEntity = _phoneNumberRepository.GetOne(x => x.PhoneNumber == contact.PhoneNumber);
+                phoneNumberEntity ??= _phoneNumberRepository.Create(new PhoneNumberEntity { PhoneNumber = contact.PhoneNumber });
+
+                var contactEntity = new ContactEntity
                 {
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
@@ -40,14 +43,26 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                     PhoneNumberId = phoneNumberEntity.Id
                 };
 
-            var result = _contactRepository.Create(contactEntity);
-                if (result != null)
-                {
-                    return true;
-                }
+                result = _contactRepository.Create(contactEntity);
+                //if (result == null)
+                //{
+                    return new ContactDto
+                    {
+                        Id = result.Id,
+                        FirstName = result.FirstName,
+                        LastName = result.LastName,
+                        Email = result.Email,
+                        StreetName = result.Address.StreetName,
+                        StreetNumber = result.Address.StreetNumber,
+                        PostalCode = result.Address.PostalCode,
+                        City = result.Address.City,
+                        PhoneNumber = result.PhoneNumber.PhoneNumber
+                    };
+                //}
+            }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-        return false;
+        return null!;
     }
 
     public IEnumerable<ContactDto> GetAll()
@@ -61,7 +76,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
             foreach (var contact in result)
             {
                 contacts.Add(new ContactDto
-                {
+                {   Id = contact.Id,
                     FirstName = contact.FirstName,
                     LastName = contact.LastName,
                     Email = contact.Email,
@@ -77,23 +92,24 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
         return contacts;
     }
 
-    public ContactDto GetOne(string email)
+    public ContactDto GetOne(ContactDto contact)
     {
         try
         {
-            var contact = _contactRepository.GetOneByEmail(email);
+            var entity = _contactRepository.GetOneById(x => x.Id == contact.Id);
             if (contact != null)
             {
                 return new ContactDto
                 {
-                    FirstName = contact.FirstName,
-                    LastName = contact.LastName,
-                    Email = contact.Email,
-                    StreetName = contact.Address?.StreetName,
-                    StreetNumber = contact.Address?.StreetNumber,
-                    PostalCode = contact.Address?.PostalCode,
-                    City = contact.Address?.City,
-                    PhoneNumber = contact.PhoneNumber?.PhoneNumber
+                    Id = entity.Id,
+                    FirstName = entity.FirstName,
+                    LastName = entity.LastName,
+                    Email = entity.Email,
+                    PhoneNumber = entity.PhoneNumber.PhoneNumber,
+                    StreetName = entity.Address.StreetName,
+                    StreetNumber = entity.Address.StreetNumber,
+                    PostalCode = entity.Address.PostalCode,
+                    City = entity.Address.City
                 };
             }
 
@@ -102,14 +118,14 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
         return null!;
     }
 
-    public bool Update(ContactDto updatedContactDto)
+    public ContactDto Update(ContactDto updatedContactDto)
     {
         try
         {
-            var contactEntity = _contactRepository.GetOne(c => c.Email == updatedContactDto.Email);
+            var contactEntity = _contactRepository.GetOne(c => c.Id == updatedContactDto.Id);
             if (contactEntity == null)
             {
-                return false;
+                return null!;
             }
 
             var addressEntity = _addressRepository.GetOne(x => x.StreetName == updatedContactDto.StreetName && x.StreetNumber == updatedContactDto.StreetNumber && x.PostalCode == updatedContactDto.PostalCode && x.City == updatedContactDto.City);
@@ -141,10 +157,10 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
             contactEntity.PhoneNumber.PhoneNumber = phoneNumberEntity.PhoneNumber;
 
             _contactRepository.Update(contactEntity);
-            return true;
+            return contactEntity;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-        return false;
+        return null!;
     }
 
     public bool Remove(string email)

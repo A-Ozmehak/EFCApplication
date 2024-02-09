@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Entities;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Interfaces;
 
@@ -9,5 +10,5 @@ public interface IContactRepository : IRepository<ContactEntity>
     /// </summary>
     /// <param name="email">The email of the contact</param>
     /// <returns>Returns the contact</returns>
-    ContactEntity GetOneByEmail(string email);
+    ContactEntity GetOneById(Expression<Func<ContactEntity, bool>> predicate);
 }

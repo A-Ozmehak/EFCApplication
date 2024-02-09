@@ -4,6 +4,7 @@ namespace Business.Dtos;
 
 public class ContactDto
 {
+    public int Id { get; set; }
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
@@ -16,10 +17,12 @@ public class ContactDto
     public string PhoneNumber { get; set; } = null!;
 
 
+
     public static implicit operator ContactDto(ContactEntity entity)
     {
         var contactDto = new ContactDto
         {
+            Id = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName,
             Email = entity.Email,

@@ -195,6 +195,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         {
             foreach (var contact in contacts)
             {
+                Console.WriteLine($"Id: {contact.Id}");
                 Console.WriteLine($"Name: {contact.FirstName} {contact.LastName}");
                 Console.WriteLine($"Email: {contact.Email}");
                 Console.WriteLine($"Phone number: {contact.PhoneNumber}");
@@ -232,20 +233,23 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("Show Contact");
         Console.WriteLine("---------------");
 
-        Console.WriteLine("Enter the email of the contact you want to see: ");
-        string email = Console.ReadLine()!;
-        ContactDto contact = _contactService.GetOne(email);
+        Console.WriteLine("Enter the Id of the contact you want to see: ");
+
+        int id = int.Parse(Console.ReadLine()!);
+        ContactDto contactToFind = new ContactDto { Id = id };
+        ContactDto contact = _contactService.GetOne(contactToFind);
 
         if (contact == null)
         {
-            Console.WriteLine("Can't find a contact with that email");
+            Console.WriteLine("Can't find a contact with that Id");
         }
         else
         {
             Console.Clear();
-            Console.WriteLine($"{contact.FirstName} {contact.LastName}");
-            Console.WriteLine($"{contact.Email} {contact.PhoneNumber}");
-            Console.WriteLine($"{contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
+            Console.WriteLine($"Id: {contact.Id}");
+            Console.WriteLine($"Name: {contact.FirstName} {contact.LastName}");
+            Console.WriteLine($"Contact info: {contact.Email} {contact.PhoneNumber}");
+            Console.WriteLine($"Address: {contact.StreetName} {contact.StreetNumber} {contact.PostalCode} {contact.City}");
             Console.WriteLine("\n\n");
         }
     }
@@ -276,54 +280,58 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("Update contact");
         Console.WriteLine("---------------");
 
-        Console.Write("Enter the Email of the contact to update: ");
-        string email = Console.ReadLine()!;
+        Console.Write("Enter the Id of the contact to update: ");
 
-        ContactDto existingContact = _contactService.GetOne(email);
+        int id = int.Parse(Console.ReadLine()!);
+        ContactDto contactToUpdate = new ContactDto { Id = id };
+        ContactDto existingContact = _contactService.GetOne(contactToUpdate);
+
         if (existingContact == null)
         {
             Console.WriteLine("\n");
-            Console.WriteLine("A contact with this email does not exist");
-            return;
+            Console.WriteLine("A contact with this id does not exist");
         }
-
-        Console.Write("Enter a new first name: ");
-        string firstName = Console.ReadLine()!;
-
-        Console.Write("Enter a new last name: ");
-        string lastName = Console.ReadLine()!;
-
-        Console.Write("Enter a new email: ");
-        string emailAddress = Console.ReadLine()!;
-
-        Console.Write("Enter a new phone number: ");
-        string phoneNumber = Console.ReadLine()!;
-
-        Console.Write("Enter a new street name: ");
-        string streetName = Console.ReadLine()!;
-
-        Console.Write("Enter a new street number: ");
-        string streetNumber = Console.ReadLine()!;
-
-        Console.Write("Enter a new postal code: ");
-        string postalCode = Console.ReadLine()!;
-
-        Console.Write("Enter a new city: ");
-        string city = Console.ReadLine()!;
-
-        var updatedContactDto = new ContactDto
+        else
         {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = emailAddress,
-            PhoneNumber = phoneNumber,
-            StreetName = streetName,
-            StreetNumber = streetNumber,
-            PostalCode = postalCode,
-            City = city
-        };
+            Console.Write("Enter a new first name: ");
+            string firstName = Console.ReadLine()!;
 
-        _contactService.Update(updatedContactDto);
+            Console.Write("Enter a new last name: ");
+            string lastName = Console.ReadLine()!;
+
+            Console.Write("Enter a new email: ");
+            string emailAddress = Console.ReadLine()!;
+
+            Console.Write("Enter a new phone number: ");
+            string phoneNumber = Console.ReadLine()!;
+
+            Console.Write("Enter a new street name: ");
+            string streetName = Console.ReadLine()!;
+
+            Console.Write("Enter a new street number: ");
+            string streetNumber = Console.ReadLine()!;
+
+            Console.Write("Enter a new postal code: ");
+            string postalCode = Console.ReadLine()!;
+
+            Console.Write("Enter a new city: ");
+            string city = Console.ReadLine()!;
+
+            var updatedContactDto = new ContactDto
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = emailAddress,
+                PhoneNumber = phoneNumber,
+                StreetName = streetName,
+                StreetNumber = streetNumber,
+                PostalCode = postalCode,
+                City = city
+            };
+
+            _contactService.Update(updatedContactDto);
+        }
     }
 
     public void UpdateProductOption()
