@@ -6,9 +6,6 @@ using Infrastructure.Entities;
 using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Moq;
-using System.Linq.Expressions;
 
 namespace Business.Test.Services;
 
@@ -42,16 +39,20 @@ public class ContactService_Tests
     }
 
     [Fact]
-    public void CreateContact_ShouldNotCreateAndSaveContact_ReturnFalse()
+    public void CreateContact_ContactAlreadyExists_ReturnFalse()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+        var contact = new ContactEntity { FirstName = "Anna", LastName = "Ozmehak", Email = "anna.ozmehak@gmail.com", PhoneNumber = new PhoneNumberEntity { PhoneNumber = "0793555635" }, Address = new AddressEntity { StreetName = "Gustaf dalensgatan", StreetNumber = "24", PostalCode = "41724", City = "Goteborg" } };
+        _context.Contacts.Add(contact);
+        _context.SaveChanges();
 
-        var contactDto = new ContactDto { FirstName = "Test", LastName = "User", Email = "test.user@example.com", StreetName = "Test Street", StreetNumber = "123", PostalCode = "12345", City = "Test City", PhoneNumber = "1234567890" };
+        IContactRepository contactRepository = new ContactRepository(_context);
+        IAddressRepository addressRepository = new AddressRepository(_context);
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        IContactService contactService = new ContactService(contactRepository, addressRepository, phoneNumberRepository);
 
+        var contactDto = new ContactDto { FirstName = "Anna", LastName = "Ozmehak", Email = "anna.ozmehak@gmail.com", PhoneNumber = "0793555635", StreetName = "Gustaf dalensgatan", StreetNumber = "24", PostalCode = "41724", City = "Goteborg" };
+        
         // Act
         var result = contactService.CreateContact(contactDto);
 
@@ -82,22 +83,17 @@ public class ContactService_Tests
         Assert.Contains(result, r => r.FirstName == secondContact.FirstName && r.Email == secondContact.Email);
     }
 
-
     [Fact]
-    public void GetAll_ShouldGetNoContacts_ReturnEmptyIEnumerable()
+    public void GetAll_ShouldGetNoContacts_ReturnEmptyList()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
-
-        var contacts = new List<ContactEntity>();
-
-        mockContactRepository.Setup(x => x.GetAll()).Returns(contacts);
+        IContactRepository contactRepository = new ContactRepository(_context);
+        IAddressRepository addressRepository = new AddressRepository(_context);
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        IContactService contactService = new ContactService(contactRepository, addressRepository, phoneNumberRepository);
 
         // Act
-        var result = contactService.GetAll();
+        var result = contactService.GetAll().ToList();
 
         // Assert
         Assert.Empty(result);
@@ -132,18 +128,16 @@ public class ContactService_Tests
     public void GetOne_ShouldNotFindOneContactById_ReturnNull()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+        IContactRepository contactRepository = new ContactRepository(_context);
+        IAddressRepository addressRepository = new AddressRepository(_context);
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        var contactService = new ContactService(contactRepository, addressRepository, phoneNumberRepository);
 
-        var contactToGet = new ContactDto { Id = 1 };
 
-        mockContactRepository.Setup(repo => repo.GetOneById(It.IsAny<Expression<Func<ContactEntity, bool>>>()))
-                   .Returns((ContactEntity)null);
+        var nonExistentContactDto = new ContactDto { Id = 999 };
 
         // Act
-        var result = contactService.GetOne(contactToGet);
+        var result = contactService.GetOne(nonExistentContactDto);
 
         // Assert
         Assert.Null(result);
@@ -169,24 +163,21 @@ public class ContactService_Tests
     }
 
     [Fact]
-    public void Update_ShouldNotUpdateContact_WhenContactDoesNotExist()
+    public void Update_ContactDoesNotExist_ReturnsNull()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+        IContactRepository contactRepository = new ContactRepository(_context);
+        IAddressRepository addressRepository = new AddressRepository(_context);
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        IContactService contactService = new ContactService(contactRepository, addressRepository, phoneNumberRepository);
 
-        var nonExistentContactDto = new ContactDto { FirstName = "Non", LastName = "Existent", Email = "non.existent.user@example.com", StreetName = "Non Existent Street", StreetNumber = "123", PostalCode = "12345", City = "Non Existent City", PhoneNumber = "1234567890" };
-
-        mockContactRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ContactEntity, bool>>>())).Returns((ContactEntity)null);
+        var nonExistentContactDto = new ContactDto { Id = 999, FirstName = "Anna", LastName = "Ozmehak", Email = "anna.ozmehak@gmail.com", PhoneNumber = "0793555635", StreetName = "Gustaf dalensgatan", StreetNumber = "24", PostalCode = " 417 24", City = "Goteborg" };
 
         // Act
         var result = contactService.Update(nonExistentContactDto);
 
         // Assert
         Assert.Null(result);
-        mockContactRepository.Verify(x => x.Update(It.IsAny<ContactEntity>()), Times.Never);
     }
 
     [Fact]
@@ -214,19 +205,17 @@ public class ContactService_Tests
     public void Remove_ShouldNotFindContactAndRemoveIt_ReturnFalse()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+        var nonExistingEmail = "anna.ozmehak@gmail.com";
 
-        var nonExistentEmail = "non.existent.user@example.com";
-
-        mockContactRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ContactEntity, bool>>>())).Returns((ContactEntity)null);
+        IContactRepository contactRepository = new ContactRepository(_context);
+        IAddressRepository addressRepository = new AddressRepository(_context);
+        IPhoneNumberRepository phoneNumberRepository = new PhoneNumberRepository(_context);
+        IContactService contactService = new ContactService(contactRepository, addressRepository, phoneNumberRepository);
 
         // Act
-        contactService.Remove(nonExistentEmail);
+        var result = contactService.Remove(nonExistingEmail);
 
         // Assert
-        mockContactRepository.Verify(x => x.Delete(It.IsAny<Expression<Func<ContactEntity, bool>>>()), Times.Never);
+        Assert.False(result);
     }
 }
