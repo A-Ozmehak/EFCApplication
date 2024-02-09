@@ -169,7 +169,23 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
 
             if (contact != null)
             {
+                var addressId = contact.AddressId;
+                var phoneNumberId = contact.PhoneNumberId;
+
                 _contactRepository.Delete(x => x.Email == email);
+
+                var addressIsUsed = _contactRepository.Exists(c => c.AddressId == addressId);
+                if (!addressIsUsed) 
+                {
+                    _addressRepository.Delete(x => x.Id == addressId);
+                }
+
+                var phoneNumberIsUsed = _contactRepository.Exists(c => c.PhoneNumberId == phoneNumberId);
+                if (!phoneNumberIsUsed)
+                {
+                    _phoneNumberRepository.Delete(x => x.Id == phoneNumberId);
+                }
+
                 return true;
             }
         }
