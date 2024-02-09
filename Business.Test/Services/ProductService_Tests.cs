@@ -193,23 +193,52 @@ public class ProductService_Tests
     public void Update_ShouldUpdateExistingProductEntity_ReturnUpdatedProductEntity()
     {
         // Arrange
+        var productDto = new ProductDto
+        {
+            Id = 1,
+            ProductName = "Milk",
+            Price = 10,
+            StoreName = "Coop"
+        };
+
+        var existingProductEntity = new ProductsEntity
+        {
+            Id = productDto.Id,
+            ProductName = "Bread",
+            Price = 15,
+            Store = new StoresEntity { StoreName = "Willys" }
+        };
+
+        var updatedProductEntity = new ProductsEntity
+        {
+            Id = productDto.Id,
+            ProductName = productDto.ProductName,
+            Price = productDto.Price,
+            Store = new StoresEntity { StoreName = productDto.StoreName }
+        };
+
         var mockProductRepository = new Mock<IProductRepository>();
+        mockProductRepository.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>()))
+            .Returns(existingProductEntity);
+        mockProductRepository.Setup(repo => repo.Update(It.IsAny<ProductsEntity>()))
+            .Returns(updatedProductEntity);
+
         var mockStoreRepository = new Mock<IStoreRepository>();
-        IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
+        mockStoreRepository.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<StoresEntity, bool>>>()))
+            .Returns((StoresEntity)null);
+        mockStoreRepository.Setup(repo => repo.Create(It.IsAny<StoresEntity>()))
+            .Returns(updatedProductEntity.Store);
 
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Willys" } };
-        var productDto = new ProductDto { ProductName = "Bread", Price = 15, StoreName = "Coop" };
-
-        mockProductRepository.Setup(x => x.GetOne(It.IsAny<Expression<Func<ProductsEntity, bool>>>())).Returns(productEntity);
-        mockProductRepository.Setup(x => x.Update(It.IsAny<ProductsEntity>())).Callback<ProductsEntity>(c => productEntity = c);
+        var productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
 
         // Act
-        var result = productService.Update(productDto);
+        var returnedProductDto = productService.Update(productDto);
 
         // Assert
-        Assert.Equal(productDto.ProductName, productEntity.ProductName);
-        Assert.Equal(productDto.Price, productEntity.Price);
-        Assert.Equal(productDto.StoreName, productEntity.Store.StoreName);
+        Assert.NotNull(returnedProductDto);
+        Assert.Equal(updatedProductEntity.Id, returnedProductDto.Id);
+        Assert.Equal(updatedProductEntity.ProductName, returnedProductDto.ProductName);
+        Assert.Equal(updatedProductEntity.Price, returnedProductDto.Price);
     }
 
     [Fact]

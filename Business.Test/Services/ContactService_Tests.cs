@@ -23,22 +23,68 @@ public class ContactService_Tests
     public void CreateContact_ShouldCreateAndSaveContact_ReturnContact()
     {
         // Arrange
-        var mockContactRepository = new Mock<IContactRepository>();
-        var mockAddressRepository = new Mock<IAddressRepository>();
-        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
-        IContactService contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
+        var contactDto = new ContactDto
+        {
+            FirstName = "Test",
+            LastName = "User",
+            Email = "test.user@example.com",
+            PhoneNumber = "1234567890",
+            StreetName = "Test Street",
+            StreetNumber = "1",
+            PostalCode = "12345",
+            City = "Test City"
+        };
 
-        var contactDtoToCreate = new ContactDto { FirstName = "Test", LastName = "User", Email = "test.user@example.com", StreetName = "Test Street", StreetNumber = "123", PostalCode = "12345", City = "Test City", PhoneNumber = "1234567890" };
-        
-        mockAddressRepository.Setup(x => x.Create(It.IsAny<AddressEntity>())).Returns(new AddressEntity());
-        mockPhoneNumberRepository.Setup(x => x.Create(It.IsAny<PhoneNumberEntity>())).Returns(new PhoneNumberEntity());
-        mockContactRepository.Setup(x => x.Create(It.IsAny<ContactEntity>())).Returns(new ContactEntity());
+        var contactEntity = new ContactEntity
+        {
+            Id = 1,
+            FirstName = contactDto.FirstName,
+            LastName = contactDto.LastName,
+            Email = contactDto.Email,
+            PhoneNumber = new PhoneNumberEntity { PhoneNumber = contactDto.PhoneNumber },
+            Address = new AddressEntity
+            {
+                StreetName = contactDto.StreetName,
+                StreetNumber = contactDto.StreetNumber,
+                PostalCode = contactDto.PostalCode,
+                City = contactDto.City
+            }
+        };
+
+        var mockContactRepository = new Mock<IContactRepository>();
+        mockContactRepository.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<ContactEntity, bool>>>()))
+            .Returns((ContactEntity)null);
+        mockContactRepository.Setup(repo => repo.Create(It.IsAny<ContactEntity>()))
+            .Returns(contactEntity);
+
+        var mockAddressRepository = new Mock<IAddressRepository>();
+        mockAddressRepository.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<AddressEntity, bool>>>()))
+            .Returns((AddressEntity)null);
+        mockAddressRepository.Setup(repo => repo.Create(It.IsAny<AddressEntity>()))
+            .Returns(contactEntity.Address);
+
+        var mockPhoneNumberRepository = new Mock<IPhoneNumberRepository>();
+        mockPhoneNumberRepository.Setup(repo => repo.GetOne(It.IsAny<Expression<Func<PhoneNumberEntity, bool>>>()))
+            .Returns((PhoneNumberEntity)null);
+        mockPhoneNumberRepository.Setup(repo => repo.Create(It.IsAny<PhoneNumberEntity>()))
+            .Returns(contactEntity.PhoneNumber);
+
+        var contactService = new ContactService(mockContactRepository.Object, mockAddressRepository.Object, mockPhoneNumberRepository.Object);
 
         // Act
-        var result = contactService.CreateContact(contactDtoToCreate);
+        var returnedContactDto = contactService.CreateContact(contactEntity);
 
         // Assert
-        Assert.NotNull(result);
+        Assert.NotNull(returnedContactDto);
+        Assert.Equal(contactEntity.Id, returnedContactDto.Id);
+        Assert.Equal(contactEntity.FirstName, returnedContactDto.FirstName);
+        Assert.Equal(contactEntity.LastName, returnedContactDto.LastName);
+        Assert.Equal(contactEntity.Email, returnedContactDto.Email);
+        Assert.Equal(contactEntity.PhoneNumber.PhoneNumber, returnedContactDto.PhoneNumber);
+        Assert.Equal(contactEntity.Address.StreetName, returnedContactDto.StreetName);
+        Assert.Equal(contactEntity.Address.StreetNumber, returnedContactDto.StreetNumber);
+        Assert.Equal(contactEntity.Address.PostalCode, returnedContactDto.PostalCode);
+        Assert.Equal(contactEntity.Address.City, returnedContactDto.City);
     }
 
     [Fact]

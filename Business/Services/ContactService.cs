@@ -44,8 +44,7 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                 };
 
                 result = _contactRepository.Create(contactEntity);
-                //if (result == null)
-                //{
+
                     return new ContactDto
                     {
                         Id = result.Id,
@@ -58,7 +57,6 @@ public class ContactService(IContactRepository contactRepository, IAddressReposi
                         City = result.Address.City,
                         PhoneNumber = result.PhoneNumber.PhoneNumber
                     };
-                //}
             }
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
