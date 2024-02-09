@@ -221,6 +221,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         {
             foreach(var product in products)
             {
+                Console.WriteLine($"Id: {product.Id}");
                 Console.WriteLine($"Store: {product.StoreName}");
                 Console.WriteLine($"Products in shopping list: {product.ProductName} {product.Price} kr");
                 Console.WriteLine("\n");
@@ -259,9 +260,10 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("Show product");
         Console.WriteLine("---------------");
 
-        Console.WriteLine("Enter the Product name of the product you want to see: ");
-        string productName = Console.ReadLine()!;
-        ProductDto product = _productService.GetOne(productName);
+        Console.WriteLine("Enter the Id of the product you want to see: ");
+        int id = int.Parse(Console.ReadLine()!);
+        ProductDto productToFind = new ProductDto { Id = id };
+        ProductDto product = _productService.GetOne(productToFind);
 
         if (product == null)
         {
@@ -269,6 +271,7 @@ internal class MenuService(IContactService contactService, IProductService produ
         }
         else
         {
+            Console.WriteLine($"Id: {product.Id}");
             Console.WriteLine($"Product and price: {product.ProductName} {product.Price} kr");
             Console.WriteLine($"Store: {product.StoreName}");
             Console.WriteLine("\n");
@@ -339,10 +342,12 @@ internal class MenuService(IContactService contactService, IProductService produ
         Console.WriteLine("Update a product");
         Console.WriteLine("---------------");
 
-        Console.Write("Enter the ProductName of the product to update: ");
-        string product = Console.ReadLine()!;
+        Console.Write("Enter the Id of the product to update: ");
+        int id = int.Parse(Console.ReadLine()!);
 
-        ProductDto existingProduct = _productService.GetOne(product);
+        ProductDto productToUpdate = new ProductDto { Id = id };
+        ProductDto existingProduct = _productService.GetOne(productToUpdate);
+
         if (existingProduct == null)
         {
             Console.WriteLine("\n");
@@ -362,6 +367,7 @@ internal class MenuService(IContactService contactService, IProductService produ
 
         var updatedProductDto = new ProductDto
         {
+            Id = id,
             ProductName = productName,
             Price = price,
             StoreName = storeName

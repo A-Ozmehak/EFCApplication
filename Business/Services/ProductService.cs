@@ -22,6 +22,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
 
                 var productEntity = new ProductsEntity
                 {
+                    Id = product.Id,
                     ProductName = product.ProductName,
                     Price = product.Price,
                     StoreId = storeEntity.Id
@@ -50,6 +51,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
             {
                 products.Add(new ProductDto
                 {
+                  Id = product.Id,
                   ProductName = product.ProductName,
                   Price = product.Price,
                   StoreName = product.Store.StoreName
@@ -60,18 +62,19 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         return products;
     }
 
-    public ProductDto GetOne(string productName)
+    public ProductDto GetOne(ProductDto product)
     {
         try
         {
-            var product = _productRepository.GetOneByProductName(productName);
+            var entity = _productRepository.GetOneById(x => x.Id == product.Id);
             if (product != null)
             {
                 return new ProductDto
                 {
-                    ProductName = product.ProductName,
-                    Price = product.Price,
-                    StoreName = product.Store.StoreName
+                    Id = entity.Id,
+                    ProductName = entity.ProductName,
+                    Price = entity.Price,
+                    StoreName = entity.Store.StoreName
                 };
             }
 
@@ -80,14 +83,14 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         return null!;
     }
 
-    public bool Update(ProductDto updatedProductDto)
+    public ProductDto Update(ProductDto updatedProductDto)
     {
         try
         {
-            var existingProduct = _productRepository.GetOne(contact => contact.ProductName == updatedProductDto.ProductName);
-            if (existingProduct == null)
+            var productEntity = _productRepository.GetOne(product => product.Id == updatedProductDto.Id);
+            if (productEntity == null)
             {
-                return false;
+                return null!;
             }
 
             var storeEntity = _storeRepository.GetOne(x => x.StoreName == updatedProductDto.StoreName);
@@ -96,16 +99,16 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
                 var newStoreEntity = new StoresEntity { StoreName = updatedProductDto.StoreName };
                 storeEntity = _storeRepository.Create(newStoreEntity);
             }
-            
-            existingProduct.ProductName = updatedProductDto.ProductName;
-            existingProduct.Price = updatedProductDto.Price;
-            existingProduct.StoreId = storeEntity.Id;
 
-            _productRepository.Update(existingProduct);
-            return true;
+            productEntity.ProductName = updatedProductDto.ProductName;
+            productEntity.Price = updatedProductDto.Price;
+            productEntity.StoreId = storeEntity.Id;
+
+            _productRepository.Update(productEntity);
+            return productEntity;
         }
         catch (Exception ex) { Debug.WriteLine(ex.Message); }
-        return false;
+        return null!;
     }
 
     public bool Remove(string productName)

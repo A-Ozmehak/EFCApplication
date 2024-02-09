@@ -2,6 +2,8 @@
 using Infrastructure.Entities;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories;
 
@@ -21,10 +23,17 @@ public class ProductRepository : Repository<ProductsEntity, ProductCatalogContex
             .ToList();
     }
 
-    public ProductsEntity GetOneByProductName(string productName)
+    public ProductsEntity GetOneById(Expression<Func<ProductsEntity, bool>> predicate)
     {
-        return _context.ProductsEntities
-            .Include(product => product.Store)
-            .SingleOrDefault(product => product.ProductName == productName)!;
+        try
+        {
+            var result = _context.Set<ProductsEntity>()
+                .Include(product => product.Store)
+                .FirstOrDefault(predicate);
+
+            return result!;
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        return null!;    
     }
 }

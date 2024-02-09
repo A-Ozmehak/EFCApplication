@@ -6,9 +6,9 @@ namespace Infrastructure.Interfaces;
 public interface IContactRepository : IRepository<ContactEntity>
 {
     /// <summary>
-    /// Gets a contact by email and includes Address and PhoneNumber
+    /// Gets the contact by id and includes the address and phonenumber
     /// </summary>
-    /// <param name="email">The email of the contact</param>
-    /// <returns>Returns the contact</returns>
+    /// <param name="predicate">A function to test each element for a condition</param>
+    /// <returns>Returns the contact otherwise null</returns>
     ContactEntity GetOneById(Expression<Func<ContactEntity, bool>> predicate);
 }

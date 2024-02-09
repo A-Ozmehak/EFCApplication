@@ -22,14 +22,14 @@ public interface IProductService
     /// </summary>
     /// <param name="productName">The productName of the product being shown</param>
     /// <returns>Returns the product, otherwise null</returns>
-    ProductDto GetOne(string productName);
+    ProductDto GetOne(ProductDto product);
 
     /// <summary>
     /// Updates the product by the productName provided
     /// </summary>
     /// <param name="product">The product being updated</param>
     /// <returns>Returns true if the product is updated, otherwise false</returns>
-    bool Update(ProductDto product);
+    ProductDto Update(ProductDto product);
 
     /// <summary>
     /// Removes a product by the productName provided.
