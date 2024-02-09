@@ -8,7 +8,7 @@ public interface IContactService
     /// Creates a new contact. If address or phone number does not exist, it creates them as well.
     /// </summary>
     /// <param name="contact">The contact data object that contains the details of the contact to be created</param>
-    /// <returns>Returns true if the contact is created, otherwise false</returns>
+    /// <returns>Returns ContactDto if the contact is created, otherwise null</returns>
     ContactDto CreateContact(ContactDto contact);
 
     /// <summary>
@@ -17,22 +17,22 @@ public interface IContactService
     /// <returns>Returns a IEnumerable list of contacts</returns>
     IEnumerable<ContactDto> GetAll();
 
-    /// <summary>
-    /// Gets one contact by the email provided.
-    /// </summary>
-    /// <param name="email">The email of the contact being shown</param>
-    /// <returns>Returns the contact, otherwise null</returns>
+   /// <summary>
+   /// Gets the contact based on the Id
+   /// </summary>
+   /// <param name="contact">The contact being shown</param>
+   /// <returns>Return ContactDto otherwise null</returns>
     ContactDto GetOne(ContactDto contact);
 
-    /// <summary>
-    /// Updates the contact by the email provided.
-    /// </summary>
-    /// <param name="contact">The contact being updated</param>
-    /// <returns>Returns true if the contact is updated, otherwise false</returns>
+   /// <summary>
+   /// Updates a contact based on the Id
+   /// </summary>
+   /// <param name="contact">The contact being updated</param>
+   /// <returns>Returns the contactEntity otherwise null</returns>
     ContactDto Update(ContactDto contact);
 
     /// <summary>
-    /// Removes a contact by the email provided.
+    /// Removes a contact by the email provided, also removed the address and phone number if it doesn't exist on another contact
     /// </summary>
     /// <param name="email">The email of the contact being removed</param>
     /// <returns>Returns true if the contact is removed, otherwise false</returns>

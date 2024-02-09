@@ -14,21 +14,21 @@ public interface IProductService
     /// <summary>
     /// Gets all products
     /// </summary>
-    /// <returns>Returns a IEnumerable list of products</returns>
+    /// <returns>Returns all products</returns>
     IEnumerable<ProductDto> GetAll();
 
     /// <summary>
-    /// Gets one product by the productName provided
+    /// Gets one contact by the Id provided
     /// </summary>
-    /// <param name="productName">The productName of the product being shown</param>
-    /// <returns>Returns the product, otherwise null</returns>
+    /// <param name="product">The product being fetched</param>
+    /// <returns>Returns ProductDto otherwise null</returns>
     ProductDto GetOne(ProductDto product);
 
-    /// <summary>
-    /// Updates the product by the productName provided
-    /// </summary>
-    /// <param name="product">The product being updated</param>
-    /// <returns>Returns true if the product is updated, otherwise false</returns>
+     /// <summary>
+     /// Updates the contact 
+     /// </summary>
+     /// <param name="product">The product being updated</param>
+     /// <returns>Returns the product, otherwise null</returns>
     ProductDto Update(ProductDto product);
 
     /// <summary>
