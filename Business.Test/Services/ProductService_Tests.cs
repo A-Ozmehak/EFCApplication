@@ -100,44 +100,53 @@ public class ProductService_Tests
     }
 
     [Fact]
-    public void Get_ShouldFindOneProductMyProductName_ReturnOneProduct()
+    public void Get_ShouldFindOneProductById_ReturnOneProduct()
     {
         // Arrange
         var mockProductRepository = new Mock<IProductRepository>();
         var mockStoreRepository = new Mock<IStoreRepository>();
         IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
 
-        var productEntity = new ProductsEntity { ProductName = "Milk", Price = 23, Store = new StoresEntity { StoreName = "Coop" } };
+        var productEntity = new ProductsEntity
+        {
+            Id = 1,
+            ProductName = "Test Product",
+            Price = 10.0m,
+            Store = new StoresEntity { StoreName = "Test Store" }
+        };
 
-        mockProductRepository.Setup(x => x.GetOneByProductName(productEntity.ProductName)).Returns(productEntity);
+        mockProductRepository.Setup(x => x.GetOneById(It.IsAny<Expression<Func<ProductsEntity, bool>>>()))
+            .Returns(productEntity);
 
         // Act
-        var result = productService.GetOne(productEntity.ProductName);
+        var returnedProductDto = productService.GetOne(productEntity);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(productEntity.ProductName, result.ProductName);
-        Assert.Equal(productEntity.Price, result.Price);
-        Assert.Equal(productEntity.Store.StoreName, result.StoreName);
+        Assert.NotNull(returnedProductDto);
+        Assert.Equal(productEntity.Id, returnedProductDto.Id);
+        Assert.Equal(productEntity.ProductName, returnedProductDto.ProductName);
+        Assert.Equal(productEntity.Price, returnedProductDto.Price);
+        Assert.Equal(productEntity.Store.StoreName, returnedProductDto.StoreName);
     }
 
     [Fact]
-    public void Get_ShouldNotFindOneProductByProductName_ReturnNull()
+    public void Get_ShouldNotFindOneProductById_ReturnNull()
     {
         // Arrange
         var mockProductRepository = new Mock<IProductRepository>();
         var mockStoreRepository = new Mock<IStoreRepository>();
         IProductService productService = new ProductService(mockProductRepository.Object, mockStoreRepository.Object);
 
-        var nonExistentProductName = "Milk";
+        mockProductRepository.Setup(repo => repo.GetOneById(It.IsAny<Expression<Func<ProductsEntity, bool>>>()))
+            .Returns((ProductsEntity)null);
 
-        mockProductRepository.Setup(x => x.GetOneByProductName(nonExistentProductName)).Returns((ProductsEntity)null);
+        var productDtoToGet = new ProductDto { Id = 1 };
 
         // Act
-        var result = productService.GetOne(nonExistentProductName);
+        var returnedProductDto = productService.GetOne(productDtoToGet);
 
         // Assert
-        Assert.Null(result);
+        Assert.Null(returnedProductDto);
     }
 
     [Fact]
@@ -219,7 +228,7 @@ public class ProductService_Tests
         var result = productService.Update(nonExistentProductDto);
 
         // Assert
-        Assert.False(result);
+        Assert.Null(result);
         mockProductRepository.Verify(x => x.Update(It.IsAny<ProductsEntity>()), Times.Never);
     }
 
