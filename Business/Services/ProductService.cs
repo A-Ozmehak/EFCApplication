@@ -115,11 +115,18 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
     {
         try
         {
-            var contact = _productRepository.GetOne(x => x.ProductName == productName);
+            var product = _productRepository.GetOne(x => x.ProductName == productName);
 
-            if (contact != null)
+            if (product != null)
             {
+                var storeId = product.StoreId;
+
                 _productRepository.Delete(x => x.ProductName == productName);
+
+                var storeIdUsed = _productRepository.Exists(p => p.StoreId == storeId);
+                if (!storeIdUsed)
+                    _storeRepository.Delete(x => x.Id == storeId);
+
                 return true;    
             }
         }
